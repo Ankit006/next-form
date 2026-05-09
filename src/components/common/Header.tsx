@@ -4,11 +4,15 @@ import { Button } from "../ui/button"
 
 export default function Header() {
   return (
-    <header className="flex items-center justify-between border-b border-gray-200 px-8 py-3">
+    <header className="flex w-full items-center justify-between pr-8">
       <h1 className="font-heading text-xl font-semibold">Next Form</h1>
       <div className="flex items-center gap-2">
-        <button><Settings size={25} /></button>
-        <button><CircleQuestionMark size={25} /></button>
+        <button>
+          <Settings size={25} />
+        </button>
+        <button>
+          <CircleQuestionMark size={25} />
+        </button>
         <Button className="border-2 border-solid border-primary bg-transparent text-lg text-primary duration-300 hover:text-white">
           Preview
         </Button>
