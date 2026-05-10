@@ -13,6 +13,7 @@ import { Route as AppRouteRouteImport } from "./routes/app/route"
 import { Route as IndexRouteImport } from "./routes/index"
 import { Route as AppSurveysIndexRouteImport } from "./routes/app/surveys/index"
 import { Route as AppDashboardIndexRouteImport } from "./routes/app/dashboard/index"
+import { Route as AppSurveysAddSurveyRouteImport } from "./routes/app/surveys/add-survey"
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: "/app",
@@ -34,16 +35,23 @@ const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
   path: "/dashboard/",
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppSurveysAddSurveyRoute = AppSurveysAddSurveyRouteImport.update({
+  id: "/surveys/add-survey",
+  path: "/surveys/add-survey",
+  getParentRoute: () => AppRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
   "/app": typeof AppRouteRouteWithChildren
+  "/app/surveys/add-survey": typeof AppSurveysAddSurveyRoute
   "/app/dashboard/": typeof AppDashboardIndexRoute
   "/app/surveys/": typeof AppSurveysIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
   "/app": typeof AppRouteRouteWithChildren
+  "/app/surveys/add-survey": typeof AppSurveysAddSurveyRoute
   "/app/dashboard": typeof AppDashboardIndexRoute
   "/app/surveys": typeof AppSurveysIndexRoute
 }
@@ -51,15 +59,32 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
   "/app": typeof AppRouteRouteWithChildren
+  "/app/surveys/add-survey": typeof AppSurveysAddSurveyRoute
   "/app/dashboard/": typeof AppDashboardIndexRoute
   "/app/surveys/": typeof AppSurveysIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/app" | "/app/dashboard/" | "/app/surveys/"
+  fullPaths:
+    | "/"
+    | "/app"
+    | "/app/surveys/add-survey"
+    | "/app/dashboard/"
+    | "/app/surveys/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/app" | "/app/dashboard" | "/app/surveys"
-  id: "__root__" | "/" | "/app" | "/app/dashboard/" | "/app/surveys/"
+  to:
+    | "/"
+    | "/app"
+    | "/app/surveys/add-survey"
+    | "/app/dashboard"
+    | "/app/surveys"
+  id:
+    | "__root__"
+    | "/"
+    | "/app"
+    | "/app/surveys/add-survey"
+    | "/app/dashboard/"
+    | "/app/surveys/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -97,15 +122,24 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AppDashboardIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    "/app/surveys/add-survey": {
+      id: "/app/surveys/add-survey"
+      path: "/surveys/add-survey"
+      fullPath: "/app/surveys/add-survey"
+      preLoaderRoute: typeof AppSurveysAddSurveyRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
 interface AppRouteRouteChildren {
+  AppSurveysAddSurveyRoute: typeof AppSurveysAddSurveyRoute
   AppDashboardIndexRoute: typeof AppDashboardIndexRoute
   AppSurveysIndexRoute: typeof AppSurveysIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppSurveysAddSurveyRoute: AppSurveysAddSurveyRoute,
   AppDashboardIndexRoute: AppDashboardIndexRoute,
   AppSurveysIndexRoute: AppSurveysIndexRoute,
 }

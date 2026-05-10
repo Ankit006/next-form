@@ -12,12 +12,12 @@ function MainLayout() {
     <div>
       <SidebarProvider>
         <AppSidebar />
-        <div className="w-screen">
+        <div>
           <div className="flex items-center border-b border-gray-200 py-3">
             <SidebarTrigger />
             <Header />
           </div>
-          <div className="pt-4 pr-8 pl-7">
+          <div className="h-full w-full bg-gray-100 pr-8 pl-7">
             <Outlet />
           </div>
         </div>
