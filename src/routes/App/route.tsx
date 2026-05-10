@@ -3,7 +3,7 @@ import AppSidebar from "@/components/common/AppSidebar"
 import Header from "@/components/common/Header"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 
-export const Route = createFileRoute("/App")({
+export const Route = createFileRoute("/app")({
   component: MainLayout,
 })
 
@@ -17,7 +17,7 @@ function MainLayout() {
             <SidebarTrigger />
             <Header />
           </div>
-          <div className="pr-8 pl-7">
+          <div className="pt-4 pr-8 pl-7">
             <Outlet />
           </div>
         </div>
