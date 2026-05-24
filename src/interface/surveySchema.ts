@@ -7,6 +7,7 @@ export enum EQuestionType {
   MATRIX_SINGLE_CHOICE = "MATRIX_SINGLE_CHOICE",
   MATRIX_MULTI_CHOICE = "MATRIX_MULTI_CHOICE",
   FILE_UPLOAD = "FILE_UPLOAD",
+  MULTI_FILE_UPLOAD = "MULTI_FILE_UPLOAD",
   DATE_TIME = "DATE_TIME",
   DATE = "DATE",
   TIME = "TIME",
@@ -30,6 +31,47 @@ export type TQuestionOptions =
           title: string
         }>
       }>
+    }
+
+export type TQuestionAnswer =
+  //  for SINGLE_CHOICE question the value hold the id of the selected choice
+  | {
+      questionType: EQuestionType.TEXT_INPUT | EQuestionType.SINGLE_CHOICE
+      value: string
+    }
+  | {
+      questionType:
+        | EQuestionType.TIME
+        | EQuestionType.DATE
+        | EQuestionType.DATE_TIME
+      value: Date
+    }
+  | {
+      questionType: EQuestionType.NUMBER_INPUT | EQuestionType.RATING
+      value: number
+    }
+  | {
+      questionType: EQuestionType.FILE_UPLOAD
+      value: File | string // string for url of the uploaded file in a remote server
+    }
+  | {
+      questionType: EQuestionType.MULTI_FILE_UPLOAD
+      vale: Array<File> | Array<string>
+    }
+  // For MULTI_CHOICE the value hold array of selected choice ids
+  | {
+      questionType:
+        | EQuestionType.REPEATABLE_INPUT
+        | EQuestionType.MULTIPLE_CHOICE
+      value: Array<string>
+    }
+  | {
+      questionType: EQuestionType.MATRIX_SINGLE_CHOICE
+      value: Array<{ rowId: string; columnId: string }>
+    }
+  | {
+      questionType: EQuestionType.MATRIX_MULTI_CHOICE
+      value: Array<{ rowId: string; columnId: Array<string> }>
     }
 
 export type TGroupOperator = "OR" | "AND"
@@ -72,6 +114,7 @@ export interface IQuestion {
   type: EQuestionType
   jumpLogic: IJumpLogic
   options?: TQuestionOptions
+  answer?: {}
 }
 
 // Logic only have two type of operator between two matching OR / AND. We have also group multiple
