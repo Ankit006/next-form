@@ -7,7 +7,6 @@ export enum EQuestionType {
   MATRIX_SINGLE_CHOICE = "MATRIX_SINGLE_CHOICE",
   MATRIX_MULTI_CHOICE = "MATRIX_MULTI_CHOICE",
   FILE_UPLOAD = "FILE_UPLOAD",
-  MULTI_FILE_UPLOAD = "MULTI_FILE_UPLOAD",
   DATE_TIME = "DATE_TIME",
   DATE = "DATE",
   TIME = "TIME",
@@ -33,7 +32,7 @@ export type TQuestionOptions =
       }>
     }
 
-export type TQuestionAnswer =
+export type TAnswer =
   //  for SINGLE_CHOICE question the value hold the id of the selected choice
   | {
       questionType: EQuestionType.TEXT_INPUT | EQuestionType.SINGLE_CHOICE
@@ -52,11 +51,7 @@ export type TQuestionAnswer =
     }
   | {
       questionType: EQuestionType.FILE_UPLOAD
-      value: File | string // string for url of the uploaded file in a remote server
-    }
-  | {
-      questionType: EQuestionType.MULTI_FILE_UPLOAD
-      vale: Array<File> | Array<string>
+      value: File | string | Array<File> | Array<string> // string for url of the uploaded file in a remote server
     }
   // For MULTI_CHOICE the value hold array of selected choice ids
   | {
@@ -76,64 +71,147 @@ export type TQuestionAnswer =
 
 export type TGroupOperator = "OR" | "AND"
 
+//   "within" is common for all the compare. it is for if a value exists in a set of values
 export type TTextInputCompare =
-  | "equal"
-  | "contains"
-  | "startsWith"
-  | "endsWith"
-  | "regexMatch"
+  | "EQUAL"
+  | "CONTAINS"
+  | "STARTS_WITH"
+  | "ENDS_WITH"
+  | "REGEX_MATCH"
+  | "WITHIN"
+
+export type TNumberCompare =
+  | "EQUAL"
+  | "GREATER"
+  | "LESSER"
+  | "GREATER_THAN_EQUAL"
+  | "LESSER_THAN_EQUAL"
+  | "WITHIN"
+
+export type TDateTimeCompare =
+  | "BEFORE"
+  | "AFTER"
+  | "EQUALS"
+  | "BEFORE_OR_EQUALS"
+  | "AFTER_OR_EQUALS"
+  | "NOT_EQUAL"
+
+export type TChoiceCompare = "EQUAL" | "WITHIN" | "NOT_WITHIN"
 
 export type TLogicCcompares =
   | {
       questionType: EQuestionType.TEXT_INPUT
       comparison: TTextInputCompare
     }
-  | {}
+  | {
+      questionType:
+        | EQuestionType.DATE
+        | EQuestionType.DATE_TIME
+        | EQuestionType.TIME
+      comparison: TDateTimeCompare
+    }
+  | {
+      questionType:
+        | EQuestionType.SINGLE_CHOICE
+        | EQuestionType.MULTIPLE_CHOICE
+        | EQuestionType.MATRIX_MULTI_CHOICE
+        | EQuestionType.MATRIX_SINGLE_CHOICE
+      comparison: TChoiceCompare
+    }
+  | {
+      questionType: EQuestionType.NUMBER_INPUT
+      comparison: TNumberCompare
+    }
+
+// Logic only have two type of operator between two matching OR / AND. We have also group multiple
+// question matching to group gether and then permon OR / AND comparison between those group.
+export interface ILogicInterface {
+  // Global group logic is to apply operators between groups. It will only be defined
+  // when there is more than one group
+  globalGroupOperator?: TGroupOperator
+  groups: Array<ILogicGroup>
+}
+
+export interface ILogicGroup {
+  id: string
+  groupOperator: TGroupOperator
+  questionComparisons: Array<ILogicCondition>
+}
+
+// now in the logical selector I have access to all of the questions in different pages or section.
+// I  can bind condition into a question based of other qeustion even if they are completly different section or page.
+// Also during logical comparison, variables will be also avaibale to select. based on values stored in the variable can also apply logic
+
+type TConditionSoruce =
+  | {
+      source: "QUESTION"
+      pageId: string
+      sectionId: string
+      questionId: string
+    }
+  | {
+      source: "VARIABLE"
+      variableId: string
+    }
+export interface ILogicCondition {
+  id: string
+  question: TConditionSoruce
+  compares: TLogicCcompares
+  expectedValue: TAnswer | string | number
+}
+
+// complex variable is specially for storing user response for different types of question
+export interface ISurveyVariable {
+  title: string
+  value?: string | number
+}
+
+export type TQuestionConfig = {
+  type: EQuestionType.DATE_TIME | EQuestionType.DATE
+  maxDate?: Date
+  minDate?: Date
+}
 
 // ------------ Main Survey ---------------------------------
 
 export interface ISurvey {
+  id: string
   name: string
   description: string
   timer?: number // in seconds
-  pages: Array<IPage>
+  pageOrder: Array<string> // order of pages, this is array of page Id
+  pages: Record<string, IPage> // string for page id
+  variables?: Array<ISurveyVariable>
 }
 
 export interface IPage {
-  sections: Array<ISection>
+  id: string
+  sectionOrder: Array<string> // order of section. holds array of section Id
+  sections: Record<string, ISection> // string for sectionId
+  jumpLogic?: ILogicInterface
+  displayLogic?: ILogicInterface
+  termiantionLogic?: ILogicInterface
 }
 
 export interface ISection {
+  id: string
   name: string
-  question: Array<IQuestion>
+  questionOrder: Array<string> // order of question, holds array of question Id
+  question: Record<string, IQuestion> // string for question id
+  jumpLogic?: ILogicInterface
+  displayLogic?: ILogicInterface
+  termiantionLogic?: ILogicInterface
 }
 
 export interface IQuestion {
   id: string // UUID
   title: string
   type: EQuestionType
-  jumpLogic: IJumpLogic
+  jumpLogic?: ILogicInterface
+  displayLogic?: ILogicInterface
+  termiantionLogic?: ILogicInterface
   options?: TQuestionOptions
-  answer?: {}
+  required: boolean
 }
 
-// Logic only have two type of operator between two matching OR / AND. We have also group multiple
-// question matching to group gether and then permon OR / AND comparison between those group.
-export interface IJumpLogic {
-  // Global group logic is to apply operators between groups. It will only be defined
-  // when there is more than one group
-  globalGroupOperator?: TGroupOperator
-  grops: Array<IJumpLogicGroup>
-}
-
-export interface IJumpLogicGroup {
-  id: string
-  groupLogic: TGroupOperator
-  questionComparisons: Array<IJumpLogicQuestionComparisons>
-}
-
-export interface IJumpLogicQuestionComparisons {
-  id: string
-  question: IQuestion
-  compares: TLogicCcompares
-}
+export type TRunTimeAnswer = Record<string, TAnswer>
