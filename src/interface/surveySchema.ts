@@ -166,12 +166,79 @@ export interface ISurveyVariable {
   value?: string | number
 }
 
-export type TQuestionConfig = {
-  type: EQuestionType.DATE_TIME | EQuestionType.DATE
-  maxDate?: Date
-  minDate?: Date
-}
+type TDateMinMax = { value: Date; errorMsg?: string }
+type TInputMinMax = { value: number; errorMsg?: string }
 
+export type TQuestionConfig =
+  | {
+      type: EQuestionType.DATE_TIME
+      maxDate?: TDateMinMax // if enabled then dates after the maxDate will be disabled
+      minDate?: TDateMinMax // if enabled then dates before the minDate will be disabled
+      rangeDate: boolean // if the calender will take date range or not
+      hour24: boolean // if time is in 24 hour format or AM/PM format
+      required: boolean
+      default?: Date | "CURRENT_DATE_TIME" // this is for if the dateTime input will prefilled by the current date time or any custom date time
+      hidden: boolean // hidden question for internal calculation purpose
+      disabled: boolean
+    }
+  | {
+      type: EQuestionType.DATE
+      maxDate?: TDateMinMax // if enabled then dates after the maxDate will be disabled
+      minDate?: TDateMinMax // if enabled then dates before the minDate will be disabled
+      rangeDate: boolean // if the calender will take date range or not
+      required: boolean
+      hidden: boolean // hidden question for internal calculation purpose
+      default?: Date | "CURRENT_DATE" // if enable then we can prefilled date input with current date or any custom date
+      disabled: boolean
+    }
+  | {
+      type: EQuestionType.TIME
+      required: boolean
+      hidden: boolean
+      hour24: boolean
+      startTime?: TDateMinMax
+      endTime?: TDateMinMax
+      default?: Date | "CURRENT_TIME" // if enabled then prefilled the input with current time or any custom time
+      disabled: boolean
+    }
+  | {
+      type: EQuestionType.TEXT_INPUT
+      required: boolean
+      hidden: boolean
+      multiline: boolean
+      minLength?: TInputMinMax
+      maxLength?: TInputMinMax
+      inputType: "password" | "email" | "phone"
+    }
+  | {
+      type: EQuestionType.NUMBER_INPUT
+      required: boolean
+      hidden: boolean
+      minNum?: TInputMinMax
+      maxNum?: TInputMinMax
+    }
+  | {
+      type: EQuestionType.FILE_UPLOAD
+      required: boolean
+      multiUpload: boolean
+      maxUploadFile?: TInputMinMax // without this if multiUpload enable user can upload unlimited docs
+    }
+  | {
+      type: EQuestionType.MATRIX_SINGLE_CHOICE
+      requird: boolean
+      hidden: boolean
+      shuffleRow: boolean
+      shuffleColumn: boolean
+    }
+  | {
+      type: EQuestionType.MATRIX_MULTI_CHOICE
+      requird: boolean
+      hidden: boolean
+      shuffleRow: boolean
+      shuffleColumn: boolean
+      maxRowSelect?: TInputMinMax
+      maxColSelect?: TInputMinMax
+    }
 // ------------ Main Survey ---------------------------------
 
 export interface ISurvey {
