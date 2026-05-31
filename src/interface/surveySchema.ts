@@ -3,7 +3,6 @@ export enum EQuestionType {
   NUMBER_INPUT = "NUMBER_INPUT",
   SINGLE_CHOICE = "SINGLE_CHOICE",
   MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
-  REPEATABLE_INPUT = "REPEATABLE_INPUT", // user can enter multiple answer for a question just like to do list
   MATRIX_SINGLE_CHOICE = "MATRIX_SINGLE_CHOICE",
   MATRIX_MULTI_CHOICE = "MATRIX_MULTI_CHOICE",
   FILE_UPLOAD = "FILE_UPLOAD",
@@ -55,9 +54,7 @@ export type TAnswer =
     }
   // For MULTI_CHOICE the value hold array of selected choice ids
   | {
-      questionType:
-        | EQuestionType.REPEATABLE_INPUT
-        | EQuestionType.MULTIPLE_CHOICE
+      questionType: EQuestionType.MULTIPLE_CHOICE
       value: Array<string>
     }
   | {
@@ -98,7 +95,7 @@ export type TDateTimeCompare =
 
 export type TChoiceCompare = "EQUAL" | "WITHIN" | "NOT_WITHIN"
 
-export type TLogicCcompares =
+export type TLogicCompares =
   | {
       questionType: EQuestionType.TEXT_INPUT
       comparison: TTextInputCompare
@@ -142,7 +139,7 @@ export interface ILogicGroup {
 // I  can bind condition into a question based of other qeustion even if they are completly different section or page.
 // Also during logical comparison, variables will be also avaibale to select. based on values stored in the variable can also apply logic
 
-type TConditionSoruce =
+type TConditionSource =
   | {
       source: "QUESTION"
       pageId: string
@@ -155,19 +152,27 @@ type TConditionSoruce =
     }
 export interface ILogicCondition {
   id: string
-  question: TConditionSoruce
-  compares: TLogicCcompares
+  source: TConditionSource
+  compares: TLogicCompares
   expectedValue: TAnswer | string | number
 }
 
 // complex variable is specially for storing user response for different types of question
 export interface ISurveyVariable {
+  id: string
   title: string
   value?: string | number
 }
 
 type TDateMinMax = { value: Date; errorMsg?: string }
 type TInputMinMax = { value: number; errorMsg?: string }
+
+export interface IShuffleConfig {
+  enable: boolean
+  order?: "RANDOM" | "ALPHABETICAL" | "REVERSE_ALPHABETICAL"
+  pinOptionTop?: Array<string> // this takes option Id, if added then the option will always pin to top during randomization. for matrix column it will be left
+  pinOptionBottom?: Array<string> // this takes option Id, if added the option will always pin to bottom during randomization. for matrix colum it will be bottom
+}
 
 export type TQuestionConfig =
   | {
@@ -208,7 +213,7 @@ export type TQuestionConfig =
       multiline: boolean
       minLength?: TInputMinMax
       maxLength?: TInputMinMax
-      inputType: "password" | "email" | "phone"
+      inputType?: "password" | "email" | "phone"
     }
   | {
       type: EQuestionType.NUMBER_INPUT
@@ -225,19 +230,39 @@ export type TQuestionConfig =
     }
   | {
       type: EQuestionType.MATRIX_SINGLE_CHOICE
-      requird: boolean
+      required: boolean
       hidden: boolean
-      shuffleRow: boolean
-      shuffleColumn: boolean
+      shuffleRow: IShuffleConfig
+      shuffleColumn: IShuffleConfig
     }
   | {
       type: EQuestionType.MATRIX_MULTI_CHOICE
-      requird: boolean
+      required: boolean
       hidden: boolean
-      shuffleRow: boolean
-      shuffleColumn: boolean
+      shuffleRow: IShuffleConfig
+      shuffleColumn: IShuffleConfig
       maxRowSelect?: TInputMinMax
       maxColSelect?: TInputMinMax
+    }
+  | {
+      type: EQuestionType.RATING
+      required: boolean
+      hidden: boolean
+      count: number // out of number
+    }
+  | {
+      type: EQuestionType.SINGLE_CHOICE
+      required: boolean
+      hidden: boolean
+      shuffle: IShuffleConfig
+    }
+  | {
+      type: EQuestionType.MULTIPLE_CHOICE
+      required: boolean
+      hidden: boolean
+      shuffle: IShuffleConfig
+      maxSelectCount?: TInputMinMax
+      minSelectCount?: TInputMinMax
     }
 // ------------ Main Survey ---------------------------------
 
@@ -257,17 +282,17 @@ export interface IPage {
   sections: Record<string, ISection> // string for sectionId
   jumpLogic?: ILogicInterface
   displayLogic?: ILogicInterface
-  termiantionLogic?: ILogicInterface
+  terminationLogic?: ILogicInterface
 }
 
 export interface ISection {
   id: string
   name: string
   questionOrder: Array<string> // order of question, holds array of question Id
-  question: Record<string, IQuestion> // string for question id
+  questions: Record<string, IQuestion> // string for question id
   jumpLogic?: ILogicInterface
   displayLogic?: ILogicInterface
-  termiantionLogic?: ILogicInterface
+  terminationLogic?: ILogicInterface
 }
 
 export interface IQuestion {
@@ -276,9 +301,9 @@ export interface IQuestion {
   type: EQuestionType
   jumpLogic?: ILogicInterface
   displayLogic?: ILogicInterface
-  termiantionLogic?: ILogicInterface
+  terminationLogic?: ILogicInterface
   options?: TQuestionOptions
-  required: boolean
+  config: TQuestionConfig
 }
 
 export type TRunTimeAnswer = Record<string, TAnswer>
