@@ -269,7 +269,7 @@ export type TQuestionConfig =
 export interface ISurvey {
   id: string
   name: string
-  description: string
+  description?: string
   timer?: number // in seconds
   pageOrder: Array<string> // order of pages, this is array of page Id
   pages: Record<string, IPage> // string for page id
@@ -278,6 +278,7 @@ export interface ISurvey {
 
 export interface IPage {
   id: string
+  name?: string
   sectionOrder: Array<string> // order of section. holds array of section Id
   sections: Record<string, ISection> // string for sectionId
   jumpLogic?: ILogicInterface
@@ -287,7 +288,7 @@ export interface IPage {
 
 export interface ISection {
   id: string
-  name: string
+  name?: string
   questionOrder: Array<string> // order of question, holds array of question Id
   questions: Record<string, IQuestion> // string for question id
   jumpLogic?: ILogicInterface
