@@ -94,7 +94,7 @@ export type TDateTimeCompare =
   | "NOT_EQUAL"
 
 export type TChoiceCompare = "EQUAL" | "WITHIN" | "NOT_WITHIN"
-
+export type TLogicExpectedValue = TAnswer | string | number
 export type TLogicCompares =
   | {
       questionType: EQuestionType.TEXT_INPUT
@@ -139,7 +139,7 @@ export interface ILogicGroup {
 // I  can bind condition into a question based of other qeustion even if they are completly different section or page.
 // Also during logical comparison, variables will be also avaibale to select. based on values stored in the variable can also apply logic
 
-type TConditionSource =
+export type TConditionSource =
   | {
       source: "QUESTION"
       pageId: string
@@ -154,7 +154,7 @@ export interface ILogicCondition {
   id: string
   source: TConditionSource
   compares: TLogicCompares
-  expectedValue: TAnswer | string | number
+  expectedValue: TLogicExpectedValue
 }
 
 // complex variable is specially for storing user response for different types of question

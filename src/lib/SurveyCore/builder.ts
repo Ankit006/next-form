@@ -60,13 +60,7 @@ const builder = {
   },
 
   // ---------------------------- //
-  createQeustion({
-    title,
-    type,
-  }: {
-    title: string
-    type: EQuestionType
-  }): IQuestion {
+  createQeustion(title: string, type: EQuestionType): IQuestion {
     const question: IQuestion = {
       id: uuid(),
       title,
@@ -77,11 +71,7 @@ const builder = {
   },
 
   // this is for creating default logic. For example let's say in the UI user toggle one of the logic section. by default this object will be created without any condition in it //
-  createJumpLogic({
-    groupOperator,
-  }: {
-    groupOperator: TGroupOperator
-  }): ILogicInterface {
+  createLogic(groupOperator: TGroupOperator): ILogicInterface {
     const logicGroup: ILogicInterface = {
       groups: [
         {
@@ -93,6 +83,8 @@ const builder = {
     }
     return logicGroup
   },
+
+  createLogicCondition() {},
 }
 
 export default builder
