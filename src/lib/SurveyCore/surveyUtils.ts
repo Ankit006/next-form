@@ -4,6 +4,7 @@ import type {
   IQuestion,
   TChoiceCompare,
   TDateTimeCompare,
+  TFileCompare,
   TLogicCompares,
   TNumberCompare,
   TQuestionConfig,
@@ -38,6 +39,11 @@ export const choiceCompare: Array<TChoiceCompare> = [
   "EQUAL",
   "NOT_WITHIN",
   "WITHIN",
+] as const
+
+export const fileCompare: Array<TFileCompare> = [
+  "IS_EMPTY",
+  "IS_NOT_EMPTY",
 ] as const
 
 export function createQuestionDefaultConfig(
@@ -214,6 +220,7 @@ type TLogicalCompareListMap = {
   [EQuestionType.MULTIPLE_CHOICE]: Array<TChoiceCompare>
   [EQuestionType.MATRIX_MULTI_CHOICE]: Array<TChoiceCompare>
   [EQuestionType.MATRIX_SINGLE_CHOICE]: Array<TChoiceCompare>
+  [EQuestionType.FILE_UPLOAD]: Array<TFileCompare>
 }
 
 export function getLogicalCompareListForQuestion<
@@ -240,6 +247,8 @@ export function getLogicalCompareListForQuestion<
       return choiceCompare as TLogicalCompareListMap[T]
     case EQuestionType.MATRIX_MULTI_CHOICE:
       return choiceCompare as TLogicalCompareListMap[T]
+    case EQuestionType.FILE_UPLOAD:
+      return fileCompare as TLogicalCompareListMap[T]
     default:
       throw new Error("Invalid question type provided")
   }
@@ -397,6 +406,20 @@ export function getLogicalCompare(
       return {
         questionType: EQuestionType.MATRIX_MULTI_CHOICE,
         comparison: compare as TChoiceCompare,
+      }
+    }
+
+    case EQuestionType.FILE_UPLOAD: {
+      const fileCompare = getLogicalCompareListForQuestion(
+        EQuestionType.FILE_UPLOAD
+      )
+      if (!fileCompare.includes(compare as TFileCompare)) {
+        throw new Error("Wrong compare provided for File uplaod field")
+      }
+
+      return {
+        questionType: EQuestionType.FILE_UPLOAD,
+        comparison: compare as TFileCompare,
       }
     }
 

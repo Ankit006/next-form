@@ -93,6 +93,8 @@ export type TDateTimeCompare =
   | "AFTER_OR_EQUALS"
   | "NOT_EQUAL"
 
+export type TFileCompare = "IS_EMPTY" | "IS_NOT_EMPTY"
+
 export type TChoiceCompare = "EQUAL" | "WITHIN" | "NOT_WITHIN"
 export type TLogicExpectedValue = TAnswer | string | number
 export type TLogicCompares =
@@ -119,6 +121,7 @@ export type TLogicCompares =
       questionType: EQuestionType.NUMBER_INPUT | EQuestionType.RATING
       comparison: TNumberCompare
     }
+  | { questionType: EQuestionType.FILE_UPLOAD; comparison: TFileCompare }
   | {
       questionType: "VARIABLE"
       dataType: "number"
