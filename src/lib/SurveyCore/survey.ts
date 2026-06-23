@@ -1,5 +1,6 @@
 import builder from "./builder"
+import engine from "./engine"
 
-const survey = { builder }
+const Survey = { builder, engine }
 
-export default survey
+export default Survey

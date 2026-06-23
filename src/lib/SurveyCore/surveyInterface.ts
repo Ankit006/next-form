@@ -12,6 +12,17 @@ export enum EQuestionType {
   RATING = "RATING",
 }
 
+export type TQuestionType =
+  | EQuestionType.TEXT_INPUT
+  | EQuestionType.NUMBER_INPUT
+  | EQuestionType.SINGLE_CHOICE
+  | EQuestionType.MULTIPLE_CHOICE
+  | EQuestionType.MATRIX_SINGLE_CHOICE
+  | EQuestionType.MATRIX_MULTI_CHOICE
+  | EQuestionType.DATE_TIME
+  | EQuestionType.DATE
+  | EQuestionType.TIME
+  | EQuestionType.RATING
 export type TQuestionOptions =
   | {
       questionType: EQuestionType.SINGLE_CHOICE | EQuestionType.MULTIPLE_CHOICE
@@ -116,8 +127,18 @@ export type TLogicCompares =
       comparison: TChoiceCompare
     }
   | {
-      questionType: EQuestionType.NUMBER_INPUT
+      questionType: EQuestionType.NUMBER_INPUT | EQuestionType.RATING
       comparison: TNumberCompare
+    }
+  | {
+      questionType: "VARIABLE"
+      dataType: "number"
+      comparison: TNumberCompare
+    }
+  | {
+      questionType: "VARIABLE"
+      dataType: "string"
+      comparison: TTextInputCompare
     }
 
 // Logic only have two type of operator between two matching OR / AND. We have also group multiple
@@ -149,6 +170,7 @@ export type TConditionSource =
   | {
       source: "VARIABLE"
       variableId: string
+      dataType: "string" | "number"
     }
 export interface ILogicCondition {
   id: string
@@ -161,6 +183,7 @@ export interface ILogicCondition {
 export interface ISurveyVariable {
   id: string
   title: string
+  dataType: "number" | "string" // represent if the variable holds string or number
   value?: string | number
 }
 
@@ -307,4 +330,4 @@ export interface IQuestion {
   config: TQuestionConfig
 }
 
-export type TRunTimeAnswer = Record<string, TAnswer>
+export type TRunTimeAnswer = Record<string, TAnswer> // string refers to as answerId
