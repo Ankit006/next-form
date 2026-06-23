@@ -3,7 +3,6 @@ import {
   createQuestionDefaultConfig,
   getLogicalCompare,
   getLogicalCompareForVariable,
-  getQuestion,
 } from "./surveyUtils"
 import type {
   EQuestionType,
@@ -72,7 +71,7 @@ const builder = {
   },
 
   // ---------------------------- //
-  createQeustion(title: string, type: EQuestionType): IQuestion {
+  createQuestion(title: string, type: EQuestionType): IQuestion {
     const question: IQuestion = {
       id: uuid(),
       title,
@@ -104,15 +103,14 @@ const builder = {
   addLogicCondition({
     source,
     compare,
-    pages,
     expectedValue,
   }: {
     source:
       | {
           source: "QUESTION"
-          pageId?: string
-          sectionId?: string
-          questionId: string
+          pageId: string
+          sectionId: string
+          question: IQuestion
         }
       | {
           source: "VARIABLE"
@@ -124,26 +122,20 @@ const builder = {
       | TNumberCompare
       | TDateTimeCompare
       | TChoiceCompare
-    pages: Record<string, IPage>
     expectedValue: TLogicExpectedValue
   }): ILogicCondition {
     if (source.source === "QUESTION") {
-      const question = getQuestion({
-        pages,
-        pageId: source.pageId,
-        sectionId: source.sectionId,
-        questionId: source.questionId,
-      })
+      const question = source.question
 
       const logicCondition: ILogicCondition = {
         id: uuid(),
         source: {
           source: "QUESTION",
-          pageId: question.pageId,
-          sectionId: question.sectionId,
-          questionId: question.question.id,
+          pageId: source.pageId,
+          sectionId: source.sectionId,
+          questionId: question.id,
         },
-        compares: getLogicalCompare(question.question.type, compare),
+        compares: getLogicalCompare(question.type, compare),
         expectedValue,
       }
 

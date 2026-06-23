@@ -12,17 +12,6 @@ export enum EQuestionType {
   RATING = "RATING",
 }
 
-export type TQuestionType =
-  | EQuestionType.TEXT_INPUT
-  | EQuestionType.NUMBER_INPUT
-  | EQuestionType.SINGLE_CHOICE
-  | EQuestionType.MULTIPLE_CHOICE
-  | EQuestionType.MATRIX_SINGLE_CHOICE
-  | EQuestionType.MATRIX_MULTI_CHOICE
-  | EQuestionType.DATE_TIME
-  | EQuestionType.DATE
-  | EQuestionType.TIME
-  | EQuestionType.RATING
 export type TQuestionOptions =
   | {
       questionType: EQuestionType.SINGLE_CHOICE | EQuestionType.MULTIPLE_CHOICE
