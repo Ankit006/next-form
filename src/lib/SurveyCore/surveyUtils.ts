@@ -80,12 +80,14 @@ export function createQuestionDefaultConfig(
         type: EQuestionType.NUMBER_INPUT,
         required: false,
         hidden: false,
+        disabled: false,
       }
     case EQuestionType.FILE_UPLOAD:
       return {
         type: EQuestionType.FILE_UPLOAD,
         required: false,
         multiUpload: false,
+        disabled: false,
       }
     case EQuestionType.MATRIX_SINGLE_CHOICE:
       return {
@@ -98,6 +100,7 @@ export function createQuestionDefaultConfig(
         shuffleRow: {
           enable: false,
         },
+        disabled: false,
       }
 
     case EQuestionType.MATRIX_MULTI_CHOICE:
@@ -107,6 +110,7 @@ export function createQuestionDefaultConfig(
         hidden: false,
         shuffleRow: { enable: false },
         shuffleColumn: { enable: false },
+        disabled: false,
       }
     case EQuestionType.RATING:
       return {
@@ -114,6 +118,7 @@ export function createQuestionDefaultConfig(
         required: false,
         hidden: false,
         count: 5,
+        disabled: false,
       }
     case EQuestionType.SINGLE_CHOICE:
       return {
@@ -121,6 +126,7 @@ export function createQuestionDefaultConfig(
         required: false,
         hidden: false,
         shuffle: { enable: false },
+        disabled: false,
       }
     case EQuestionType.MULTIPLE_CHOICE:
       return {
@@ -128,6 +134,7 @@ export function createQuestionDefaultConfig(
         required: false,
         hidden: false,
         shuffle: { enable: false },
+        disabled: false,
       }
     case EQuestionType.TEXT_INPUT:
       return {
@@ -135,6 +142,7 @@ export function createQuestionDefaultConfig(
         required: false,
         hidden: false,
         multiline: false,
+        disabled: false,
       }
     default:
       throw new Error("wrong question type")
@@ -277,6 +285,7 @@ export function getLogicalCompare(
     | TNumberCompare
     | TDateTimeCompare
     | TChoiceCompare
+    | TFileCompare
 ): TLogicCompares {
   switch (type) {
     case EQuestionType.TEXT_INPUT: {
@@ -448,7 +457,7 @@ export function getLogicalCompareForVariable(
     const compareList = getLogicalCompareListForVariable("number")
 
     if (!compareList.includes(compare as TNumberCompare)) {
-      throw new Error("wrong compare provided for string variable")
+      throw new Error("wrong compare provided for number variable")
     }
 
     return {

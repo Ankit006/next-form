@@ -229,6 +229,7 @@ export type TQuestionConfig =
       minLength?: TInputMinMax
       maxLength?: TInputMinMax
       inputType?: "password" | "email" | "phone"
+      disabled: boolean
     }
   | {
       type: EQuestionType.NUMBER_INPUT
@@ -236,12 +237,14 @@ export type TQuestionConfig =
       hidden: boolean
       minNum?: TInputMinMax
       maxNum?: TInputMinMax
+      disabled: boolean
     }
   | {
       type: EQuestionType.FILE_UPLOAD
       required: boolean
       multiUpload: boolean
       maxUploadFile?: TInputMinMax // without this if multiUpload enable user can upload unlimited docs
+      disabled: boolean
     }
   | {
       type: EQuestionType.MATRIX_SINGLE_CHOICE
@@ -249,6 +252,7 @@ export type TQuestionConfig =
       hidden: boolean
       shuffleRow: IShuffleConfig
       shuffleColumn: IShuffleConfig
+      disabled: boolean
     }
   | {
       type: EQuestionType.MATRIX_MULTI_CHOICE
@@ -258,18 +262,21 @@ export type TQuestionConfig =
       shuffleColumn: IShuffleConfig
       maxRowSelect?: TInputMinMax
       maxColSelect?: TInputMinMax
+      disabled: boolean
     }
   | {
       type: EQuestionType.RATING
       required: boolean
       hidden: boolean
       count: number // out of number
+      disabled: boolean
     }
   | {
       type: EQuestionType.SINGLE_CHOICE
       required: boolean
       hidden: boolean
       shuffle: IShuffleConfig
+      disabled: boolean
     }
   | {
       type: EQuestionType.MULTIPLE_CHOICE
@@ -278,6 +285,7 @@ export type TQuestionConfig =
       shuffle: IShuffleConfig
       maxSelectCount?: TInputMinMax
       minSelectCount?: TInputMinMax
+      disabled: boolean
     }
 // ------------ Main Survey ---------------------------------
 
