@@ -94,6 +94,10 @@ export type TDateTimeCompare =
   | "NOT_EQUAL"
 
 export type TFileCompare = "IS_EMPTY" | "IS_NOT_EMPTY"
+export type TMatrixCompare =
+  | "ROW_COLUMN_EQUAL"
+  | "ROW_COLUMN_WITHIN"
+  | "ROW_COLUMN_NOT_WITHIN"
 
 export type TChoiceCompare = "EQUAL" | "WITHIN" | "NOT_WITHIN"
 export type TLogicExpectedValue =
@@ -102,6 +106,7 @@ export type TLogicExpectedValue =
   | number
   | Array<string>
   | Array<number>
+  | Date
 export type TLogicCompares =
   | {
       questionType: EQuestionType.TEXT_INPUT
@@ -115,12 +120,14 @@ export type TLogicCompares =
       comparison: TDateTimeCompare
     }
   | {
+      questionType: EQuestionType.SINGLE_CHOICE | EQuestionType.MULTIPLE_CHOICE
+      comparison: TChoiceCompare
+    }
+  | {
       questionType:
-        | EQuestionType.SINGLE_CHOICE
-        | EQuestionType.MULTIPLE_CHOICE
         | EQuestionType.MATRIX_MULTI_CHOICE
         | EQuestionType.MATRIX_SINGLE_CHOICE
-      comparison: TChoiceCompare
+      comparison: TMatrixCompare
     }
   | {
       questionType: EQuestionType.NUMBER_INPUT | EQuestionType.RATING

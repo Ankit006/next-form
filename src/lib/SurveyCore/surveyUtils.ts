@@ -6,12 +6,13 @@ import type {
   TDateTimeCompare,
   TFileCompare,
   TLogicCompares,
+  TMatrixCompare,
   TNumberCompare,
   TQuestionConfig,
   TTextInputCompare,
 } from "./surveyInterface"
 
-export const textCompare: Array<TTextInputCompare> = [
+export const textCompare: ReadonlyArray<TTextInputCompare> = [
   "CONTAINS",
   "ENDS_WITH",
   "EQUAL",
@@ -19,7 +20,7 @@ export const textCompare: Array<TTextInputCompare> = [
   "STARTS_WITH",
   "WITHIN",
 ] as const
-export const numberCompare: Array<TNumberCompare> = [
+export const numberCompare: ReadonlyArray<TNumberCompare> = [
   "EQUAL",
   "GREATER",
   "GREATER_THAN_EQUAL",
@@ -27,7 +28,7 @@ export const numberCompare: Array<TNumberCompare> = [
   "LESSER_THAN_EQUAL",
   "WITHIN",
 ] as const
-export const dateCompare: Array<TDateTimeCompare> = [
+export const dateCompare: ReadonlyArray<TDateTimeCompare> = [
   "AFTER",
   "AFTER_OR_EQUALS",
   "BEFORE",
@@ -35,15 +36,21 @@ export const dateCompare: Array<TDateTimeCompare> = [
   "EQUALS",
   "NOT_EQUAL",
 ] as const
-export const choiceCompare: Array<TChoiceCompare> = [
+export const choiceCompare: ReadonlyArray<TChoiceCompare> = [
   "EQUAL",
   "NOT_WITHIN",
   "WITHIN",
 ] as const
 
-export const fileCompare: Array<TFileCompare> = [
+export const fileCompare: ReadonlyArray<TFileCompare> = [
   "IS_EMPTY",
   "IS_NOT_EMPTY",
+] as const
+
+export const matrixCompare: ReadonlyArray<TMatrixCompare> = [
+  "ROW_COLUMN_EQUAL",
+  "ROW_COLUMN_NOT_WITHIN",
+  "ROW_COLUMN_WITHIN",
 ] as const
 
 export function createQuestionDefaultConfig(
@@ -226,8 +233,8 @@ type TLogicalCompareListMap = {
   [EQuestionType.TIME]: Array<TDateTimeCompare>
   [EQuestionType.SINGLE_CHOICE]: Array<TChoiceCompare>
   [EQuestionType.MULTIPLE_CHOICE]: Array<TChoiceCompare>
-  [EQuestionType.MATRIX_MULTI_CHOICE]: Array<TChoiceCompare>
-  [EQuestionType.MATRIX_SINGLE_CHOICE]: Array<TChoiceCompare>
+  [EQuestionType.MATRIX_MULTI_CHOICE]: Array<TMatrixCompare>
+  [EQuestionType.MATRIX_SINGLE_CHOICE]: Array<TMatrixCompare>
   [EQuestionType.FILE_UPLOAD]: Array<TFileCompare>
 }
 
@@ -252,9 +259,9 @@ export function getLogicalCompareListForQuestion<
     case EQuestionType.MULTIPLE_CHOICE:
       return choiceCompare as TLogicalCompareListMap[T]
     case EQuestionType.MATRIX_SINGLE_CHOICE:
-      return choiceCompare as TLogicalCompareListMap[T]
+      return matrixCompare as TLogicalCompareListMap[T]
     case EQuestionType.MATRIX_MULTI_CHOICE:
-      return choiceCompare as TLogicalCompareListMap[T]
+      return matrixCompare as TLogicalCompareListMap[T]
     case EQuestionType.FILE_UPLOAD:
       return fileCompare as TLogicalCompareListMap[T]
     default:
@@ -394,13 +401,13 @@ export function getLogicalCompare(
       const matrixCompares = getLogicalCompareListForQuestion(
         EQuestionType.MATRIX_SINGLE_CHOICE
       )
-      if (!matrixCompares.includes(compare as TChoiceCompare)) {
+      if (!matrixCompares.includes(compare as TMatrixCompare)) {
         throw new Error("wrong choice provided for matrix single input")
       }
 
       return {
         questionType: EQuestionType.MATRIX_SINGLE_CHOICE,
-        comparison: compare as TChoiceCompare,
+        comparison: compare as TMatrixCompare,
       }
     }
 
@@ -408,13 +415,13 @@ export function getLogicalCompare(
       const multiMatrixCompares = getLogicalCompareListForQuestion(
         EQuestionType.MATRIX_MULTI_CHOICE
       )
-      if (!multiMatrixCompares.includes(compare as TChoiceCompare)) {
+      if (!multiMatrixCompares.includes(compare as TMatrixCompare)) {
         throw new Error("wrong choice provided for matrix multi input")
       }
 
       return {
         questionType: EQuestionType.MATRIX_MULTI_CHOICE,
-        comparison: compare as TChoiceCompare,
+        comparison: compare as TMatrixCompare,
       }
     }
 
