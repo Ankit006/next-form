@@ -1,5 +1,5 @@
 import { clsx } from "clsx"
-import * as dayjs from "dayjs"
+import dayjs from "dayjs"
 import { twMerge } from "tailwind-merge"
 import type { ClassValue } from "clsx"
 
@@ -28,7 +28,7 @@ export function isValidDate(value: string | number): boolean {
 }
 
 // check if two array has same length and contains same elements
-export function contansSameElement<T extends string | number>(
+export function containsSameElement<T extends string | number>(
   arr1: Array<T> | Array<T>,
   arr2: Array<T> | Array<T>
 ): boolean {

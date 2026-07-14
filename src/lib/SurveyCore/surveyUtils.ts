@@ -474,3 +474,52 @@ export function getLogicalCompareForVariable(
     }
   }
 }
+
+export function isMatrixValueArray(
+  val: unknown
+): val is Array<{ rowId: string; columnId: string }> {
+  return (
+    Array.isArray(val) &&
+    val.every((data) => {
+      if (typeof data === "object" && "rowId" in data && "columnId" in data) {
+        return true
+      } else {
+        return false
+      }
+    })
+  )
+}
+
+export function isMatrixArrayContainsSame(
+  arr1: Array<{ rowId: string; columnId: string }>,
+  arr2: Array<{ rowId: string; columnId: string }>
+) {
+  const counts = new Map<string, number>()
+
+  for (const val of arr1) {
+    const key = `${val.rowId}-${val.columnId}`
+    counts.set(key, (counts.get(key) || 0) + 1)
+  }
+
+  for (const val of arr2) {
+    const key = `${val.rowId}-${val.columnId}`
+    const num = counts.get(key) || 0
+    if (num === 0) return false
+    counts.set(key, num - 1)
+  }
+
+  return true
+}
+
+export function isMatrixSubValueList(
+  list: Array<{ rowId: string; columnId: string }>,
+  subList: Array<{ rowId: string; columnId: string }>
+) {
+  const uniqueList = new Set<string>(
+    list.map((data) => `${data.rowId}-${data.columnId}`)
+  )
+
+  return subList.every((data) =>
+    uniqueList.has(`${data.rowId}-${data.columnId}`)
+  )
+}

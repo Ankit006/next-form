@@ -1,13 +1,18 @@
-import * as dayjs from "dayjs"
+import dayjs from "dayjs"
 import {
   containsAll,
-  contansSameElement,
+  containsSameElement,
   isNumber,
   isNumberArray,
   isString,
   isStringArray,
 } from "../utils"
 import { EQuestionType } from "./surveyInterface"
+import {
+  isMatrixArrayContainsSame,
+  isMatrixSubValueList,
+  isMatrixValueArray,
+} from "./surveyUtils"
 import type {
   TAnswer,
   TChoiceCompare,
@@ -15,6 +20,7 @@ import type {
   TFileCompare,
   TLogicCompares,
   TLogicExpectedValue,
+  TMatrixCompare,
   TNumberCompare,
   TTextInputCompare,
 } from "./surveyInterface"
@@ -93,7 +99,7 @@ const engine = {
   ) {
     switch (compare) {
       case "EQUAL": {
-        return contansSameElement<string | number>(answer, expected)
+        return containsSameElement<string | number>(answer, expected)
       }
 
       case "WITHIN": {
@@ -157,7 +163,11 @@ const engine = {
     }
   },
 
-  evaluateDateCompare(compare: TDateTimeCompare, answer: Date, expected: Date) {
+  evaluateDateCompare(
+    compare: TDateTimeCompare,
+    answer: string,
+    expected: string
+  ) {
     switch (compare) {
       case "AFTER": {
         return dayjs(answer).isAfter(expected)
@@ -199,6 +209,72 @@ const engine = {
     }
   },
 
+  evaluateMatrixSingleChoice(
+    compare: TMatrixCompare,
+    userAnswer: { rowId: string; columnId: string },
+    expectedAnswer:
+      | { rowId: string; columnId: string }
+      | Array<{ rowId: string; columnId: string }>
+  ) {
+    switch (compare) {
+      case "ROW_COLUMN_EQUAL": {
+        if (Array.isArray(expectedAnswer))
+          throw new Error("exptedAnswer must object, got array")
+
+        return (
+          userAnswer.rowId === expectedAnswer.rowId &&
+          userAnswer.columnId === expectedAnswer.columnId
+        )
+      }
+      case "ROW_COLUMN_WITHIN": {
+        if (!isMatrixValueArray(expectedAnswer))
+          throw new Error("expectedAnswer must be an array")
+        return expectedAnswer.some(
+          (val) =>
+            val.rowId === userAnswer.rowId &&
+            val.columnId === userAnswer.columnId
+        )
+      }
+      case "ROW_COLUMN_NOT_WITHIN": {
+        if (!isMatrixValueArray(expectedAnswer))
+          throw new Error("expectedAnswer must be an array")
+        return !expectedAnswer.some(
+          (val) =>
+            val.rowId === userAnswer.rowId &&
+            val.columnId === userAnswer.columnId
+        )
+      }
+
+      default: {
+        throw new Error("invalid compare type")
+      }
+    }
+  },
+
+  evaluateMatrixMultiChoice(
+    compare: TMatrixCompare,
+    userAnswer: Array<{ rowId: string; columnId: string }>,
+    expectedAnwer: Array<{ rowId: string; columnId: string }>
+  ) {
+    switch (compare) {
+      case "ROW_COLUMN_EQUAL": {
+        if (userAnswer.length !== expectedAnwer.length) return false
+        return isMatrixArrayContainsSame(expectedAnwer, userAnswer)
+      }
+
+      case "ROW_COLUMN_NOT_WITHIN": {
+        return !isMatrixSubValueList(expectedAnwer, userAnswer)
+      }
+
+      case "ROW_COLUMN_WITHIN": {
+        return isMatrixSubValueList(expectedAnwer, userAnswer)
+      }
+      default: {
+        throw new Error("invalid compare type")
+      }
+    }
+  },
+
   evaluateCondition(params: TEvaluteConditionPayload) {
     if (params.type === "QUESTION") {
       switch (params.questionType) {
@@ -220,13 +296,20 @@ const engine = {
           return this.evaluateTextCompare(compare, answer, params.expectedValue)
         }
 
+        case EQuestionType.RATING:
         case EQuestionType.NUMBER_INPUT: {
-          if (params.compare.questionType !== EQuestionType.NUMBER_INPUT) {
+          if (
+            params.compare.questionType !== EQuestionType.NUMBER_INPUT &&
+            params.compare.questionType !== EQuestionType.RATING
+          ) {
             throw new Error("compare questionType mismatch")
           }
           const compare = params.compare.comparison
 
-          if (params.userAnswer.questionType !== EQuestionType.NUMBER_INPUT) {
+          if (
+            params.userAnswer.questionType !== EQuestionType.NUMBER_INPUT &&
+            params.userAnswer.questionType !== EQuestionType.RATING
+          ) {
             throw new Error("userAnswer question type mismatch")
           }
           const answer = params.userAnswer.value
@@ -234,7 +317,7 @@ const engine = {
             !isNumberArray(params.expectedValue) &&
             !isNumber(params.expectedValue)
           ) {
-            throw new Number("only number and array of number expected")
+            throw new Number("only number or array of number expected")
           }
 
           return this.evaluateNumberCompare(
@@ -242,6 +325,53 @@ const engine = {
             answer,
             params.expectedValue
           )
+        }
+
+        case EQuestionType.DATE:
+        case EQuestionType.DATE_TIME:
+        case EQuestionType.TIME: {
+          const compareQuestionType = params.compare.questionType
+          if (
+            compareQuestionType !== EQuestionType.DATE &&
+            compareQuestionType !== EQuestionType.DATE_TIME &&
+            compareQuestionType !== EQuestionType.TIME
+          ) {
+            throw new Error("compare question type mismatch")
+          }
+
+          const answerType = params.userAnswer.questionType
+
+          if (
+            answerType !== EQuestionType.DATE &&
+            answerType !== EQuestionType.DATE_TIME &&
+            answerType !== EQuestionType.TIME
+          ) {
+            throw new Error("invalid user answer type")
+          }
+
+          if (!isString(params.expectedValue)) {
+            throw new Error("expected value must be string or number")
+          }
+
+          if (!dayjs(params.expectedValue).isValid()) {
+            throw new Error("expected value not a valid date")
+          }
+
+          return this.evaluateDateCompare(
+            params.compare.comparison,
+            params.userAnswer.value,
+            params.expectedValue
+          )
+        }
+        case EQuestionType.MATRIX_SINGLE_CHOICE:
+        case EQuestionType.MATRIX_MULTI_CHOICE: {
+          if (
+            params.compare.questionType !==
+              EQuestionType.MATRIX_SINGLE_CHOICE &&
+            params.compare.questionType !== EQuestionType.MATRIX_MULTI_CHOICE
+          ) {
+            throw new Error("invalida compare type")
+          }
         }
       }
     }

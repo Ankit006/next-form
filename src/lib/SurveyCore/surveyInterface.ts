@@ -42,7 +42,7 @@ export type TAnswer =
         | EQuestionType.TIME
         | EQuestionType.DATE
         | EQuestionType.DATE_TIME
-      value: Date
+      value: string
     }
   | {
       questionType: EQuestionType.NUMBER_INPUT | EQuestionType.RATING
@@ -52,18 +52,13 @@ export type TAnswer =
       questionType: EQuestionType.FILE_UPLOAD
       value: File | string | Array<File> | Array<string> // string for url of the uploaded file in a remote server
     }
-  // For MULTI_CHOICE the value hold array of selected choice ids
-  | {
-      questionType: EQuestionType.MULTIPLE_CHOICE
-      value: Array<string>
-    }
   | {
       questionType: EQuestionType.MATRIX_SINGLE_CHOICE
-      value: Array<{ rowId: string; columnId: string }>
+      value: { rowId: string; columnId: string }
     }
   | {
       questionType: EQuestionType.MATRIX_MULTI_CHOICE
-      value: Array<{ rowId: string; columnId: Array<string> }>
+      value: Array<{ rowId: string; columnId: string }>
     }
 
 export type TGroupOperator = "OR" | "AND"
@@ -107,6 +102,7 @@ export type TLogicExpectedValue =
   | Array<string>
   | Array<number>
   | Date
+  | { rowId: string; columnId: string | Array<string> }
 export type TLogicCompares =
   | {
       questionType: EQuestionType.TEXT_INPUT
