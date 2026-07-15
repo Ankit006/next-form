@@ -254,20 +254,20 @@ const engine = {
   evaluateMatrixMultiChoice(
     compare: TMatrixCompare,
     userAnswer: Array<{ rowId: string; columnId: string }>,
-    expectedAnwer: Array<{ rowId: string; columnId: string }>
+    expectedAnswer: Array<{ rowId: string; columnId: string }>
   ) {
     switch (compare) {
       case "ROW_COLUMN_EQUAL": {
-        if (userAnswer.length !== expectedAnwer.length) return false
-        return isMatrixArrayContainsSame(expectedAnwer, userAnswer)
+        if (userAnswer.length !== expectedAnswer.length) return false
+        return isMatrixArrayContainsSame(expectedAnswer, userAnswer)
       }
 
       case "ROW_COLUMN_NOT_WITHIN": {
-        return !isMatrixSubValueList(expectedAnwer, userAnswer)
+        return !isMatrixSubValueList(expectedAnswer, userAnswer)
       }
 
       case "ROW_COLUMN_WITHIN": {
-        return isMatrixSubValueList(expectedAnwer, userAnswer)
+        return isMatrixSubValueList(expectedAnswer, userAnswer)
       }
       default: {
         throw new Error("invalid compare type")
