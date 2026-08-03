@@ -426,10 +426,10 @@ export function getLogicalCompare(
     }
 
     case EQuestionType.FILE_UPLOAD: {
-      const fileCompare = getLogicalCompareListForQuestion(
+      const fileCompareList = getLogicalCompareListForQuestion(
         EQuestionType.FILE_UPLOAD
       )
-      if (!fileCompare.includes(compare as TFileCompare)) {
+      if (!fileCompareList.includes(compare as TFileCompare)) {
         throw new Error("Wrong compare provided for File uplaod field")
       }
 
