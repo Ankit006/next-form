@@ -1,0 +1,6 @@
+dist
+.output
+node_modules
+src/lib
+src/components/ui
+src/routeTree.gen.ts

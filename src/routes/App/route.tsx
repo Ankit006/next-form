@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Outlet } from "@tanstack/react-router"
 import AppSidebar from "@/components/common/AppSidebar"
 import Header from "@/components/common/Header"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"

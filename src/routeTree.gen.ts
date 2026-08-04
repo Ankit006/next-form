@@ -8,83 +8,83 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as AppRouteRouteImport } from "./routes/app/route"
-import { Route as IndexRouteImport } from "./routes/index"
-import { Route as AppSurveysIndexRouteImport } from "./routes/app/surveys/index"
-import { Route as AppDashboardIndexRouteImport } from "./routes/app/dashboard/index"
-import { Route as AppSurveysAddSurveyRouteImport } from "./routes/app/surveys/add-survey"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteRouteImport } from './routes/app/route'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSurveysIndexRouteImport } from './routes/app/surveys/index'
+import { Route as AppDashboardIndexRouteImport } from './routes/app/dashboard/index'
+import { Route as AppSurveysAddSurveyRouteImport } from './routes/app/surveys/add-survey'
 
 const AppRouteRoute = AppRouteRouteImport.update({
-  id: "/app",
-  path: "/app",
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppSurveysIndexRoute = AppSurveysIndexRouteImport.update({
-  id: "/surveys/",
-  path: "/surveys/",
+  id: '/surveys/',
+  path: '/surveys/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
-  id: "/dashboard/",
-  path: "/dashboard/",
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppSurveysAddSurveyRoute = AppSurveysAddSurveyRouteImport.update({
-  id: "/surveys/add-survey",
-  path: "/surveys/add-survey",
+  id: '/surveys/add-survey',
+  path: '/surveys/add-survey',
   getParentRoute: () => AppRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute
-  "/app": typeof AppRouteRouteWithChildren
-  "/app/surveys/add-survey": typeof AppSurveysAddSurveyRoute
-  "/app/dashboard/": typeof AppDashboardIndexRoute
-  "/app/surveys/": typeof AppSurveysIndexRoute
+  '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
+  '/app/surveys/add-survey': typeof AppSurveysAddSurveyRoute
+  '/app/dashboard/': typeof AppDashboardIndexRoute
+  '/app/surveys/': typeof AppSurveysIndexRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute
-  "/app": typeof AppRouteRouteWithChildren
-  "/app/surveys/add-survey": typeof AppSurveysAddSurveyRoute
-  "/app/dashboard": typeof AppDashboardIndexRoute
-  "/app/surveys": typeof AppSurveysIndexRoute
+  '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
+  '/app/surveys/add-survey': typeof AppSurveysAddSurveyRoute
+  '/app/dashboard': typeof AppDashboardIndexRoute
+  '/app/surveys': typeof AppSurveysIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/": typeof IndexRoute
-  "/app": typeof AppRouteRouteWithChildren
-  "/app/surveys/add-survey": typeof AppSurveysAddSurveyRoute
-  "/app/dashboard/": typeof AppDashboardIndexRoute
-  "/app/surveys/": typeof AppSurveysIndexRoute
+  '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
+  '/app/surveys/add-survey': typeof AppSurveysAddSurveyRoute
+  '/app/dashboard/': typeof AppDashboardIndexRoute
+  '/app/surveys/': typeof AppSurveysIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/app"
-    | "/app/surveys/add-survey"
-    | "/app/dashboard/"
-    | "/app/surveys/"
+    | '/'
+    | '/app'
+    | '/app/surveys/add-survey'
+    | '/app/dashboard/'
+    | '/app/surveys/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/app"
-    | "/app/surveys/add-survey"
-    | "/app/dashboard"
-    | "/app/surveys"
+    | '/'
+    | '/app'
+    | '/app/surveys/add-survey'
+    | '/app/dashboard'
+    | '/app/surveys'
   id:
-    | "__root__"
-    | "/"
-    | "/app"
-    | "/app/surveys/add-survey"
-    | "/app/dashboard/"
-    | "/app/surveys/"
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/app/surveys/add-survey'
+    | '/app/dashboard/'
+    | '/app/surveys/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -92,40 +92,40 @@ export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/app": {
-      id: "/app"
-      path: "/app"
-      fullPath: "/app"
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
       preLoaderRoute: typeof AppRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/": {
-      id: "/"
-      path: "/"
-      fullPath: "/"
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/app/surveys/": {
-      id: "/app/surveys/"
-      path: "/surveys"
-      fullPath: "/app/surveys/"
+    '/app/surveys/': {
+      id: '/app/surveys/'
+      path: '/surveys'
+      fullPath: '/app/surveys/'
       preLoaderRoute: typeof AppSurveysIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    "/app/dashboard/": {
-      id: "/app/dashboard/"
-      path: "/dashboard"
-      fullPath: "/app/dashboard/"
+    '/app/dashboard/': {
+      id: '/app/dashboard/'
+      path: '/dashboard'
+      fullPath: '/app/dashboard/'
       preLoaderRoute: typeof AppDashboardIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    "/app/surveys/add-survey": {
-      id: "/app/surveys/add-survey"
-      path: "/surveys/add-survey"
-      fullPath: "/app/surveys/add-survey"
+    '/app/surveys/add-survey': {
+      id: '/app/surveys/add-survey'
+      path: '/surveys/add-survey'
+      fullPath: '/app/surveys/add-survey'
       preLoaderRoute: typeof AppSurveysAddSurveyRouteImport
       parentRoute: typeof AppRouteRoute
     }
@@ -145,7 +145,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
-  AppRouteRouteChildren
+  AppRouteRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
@@ -155,12 +155,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from "./router.tsx"
-import type { createStart } from "@tanstack/react-start"
-declare module "@tanstack/react-start" {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
