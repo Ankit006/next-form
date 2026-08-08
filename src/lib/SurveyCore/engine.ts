@@ -7,12 +7,6 @@ import {
   isString,
   isStringArray,
 } from "../utils"
-import { EQuestionType } from "./surveyInterface"
-import {
-  isMatrixArrayContainsSame,
-  isMatrixSubValueList,
-  isMatrixValueArray,
-} from "./surveyUtils"
 import type {
   TAnswer,
   TChoiceCompare,
@@ -24,6 +18,12 @@ import type {
   TNumberCompare,
   TTextInputCompare,
 } from "./surveyInterface"
+import { EQuestionType } from "./surveyInterface"
+import {
+  isMatrixArrayContainsSame,
+  isMatrixSubValueList,
+  isMatrixValueArray,
+} from "./surveyUtils"
 
 type TEvaluteConditionPayload =
   | {
@@ -52,7 +52,7 @@ const engine = {
   evaluateTextCompare(
     compare: TTextInputCompare,
     answer: string,
-    expected: string | Array<string>
+    expected: string | Array<string>,
   ) {
     switch (compare) {
       case "EQUAL": {
@@ -92,22 +92,22 @@ const engine = {
     }
   },
 
-  evaluteChoiceCompare(
+  evaluateMultiChoiceCompare(
     compare: TChoiceCompare,
-    answer: Array<string> | Array<number>,
-    expected: Array<string> | Array<number>
+    answer: Array<string>,
+    expected: Array<string>,
   ) {
     switch (compare) {
       case "EQUAL": {
-        return containsSameElement<string | number>(answer, expected)
+        return containsSameElement<string>(answer, expected)
       }
 
       case "WITHIN": {
-        return containsAll<string | number>(answer, expected)
+        return containsAll<string>(answer, expected)
       }
 
       case "NOT_WITHIN": {
-        return !containsAll<string | number>(answer, expected)
+        return !containsAll<string>(answer, expected)
       }
       default: {
         throw new Error("unxpected compare provided")
@@ -115,10 +115,44 @@ const engine = {
     }
   },
 
+  evaluatesingleChoiceCompare(
+    compare: TChoiceCompare,
+    answer: string,
+    expected: string | Array<string>,
+  ) {
+    switch (compare) {
+      case "EQUAL": {
+        if (isStringArray(expected)) {
+          throw new Error("invalid expected value")
+        }
+        return answer === expected
+      }
+      case "NOT_WITHIN": {
+        if (!isStringArray(expected)) {
+          throw new Error("invalid expected value")
+        }
+
+        return !expected.includes(answer)
+      }
+
+      case "WITHIN": {
+        if (!isStringArray(expected)) {
+          throw new Error("invalid expected value")
+        }
+
+        return expected.includes(answer)
+      }
+
+      default: {
+        throw new Error("unexpected compare provided")
+      }
+    }
+  },
+
   evaluateNumberCompare(
     compare: TNumberCompare,
     answer: number,
-    expected: number | Array<number>
+    expected: number | Array<number>,
   ) {
     switch (compare) {
       case "EQUAL": {
@@ -166,7 +200,7 @@ const engine = {
   evaluateDateCompare(
     compare: TDateTimeCompare,
     answer: string,
-    expected: string
+    expected: string,
   ) {
     switch (compare) {
       case "AFTER": {
@@ -195,7 +229,7 @@ const engine = {
     }
   },
 
-  evaluateFileCOmpare(compare: TFileCompare, answer: Array<File>) {
+  evaluateFileCompare(compare: TFileCompare, answer: Array<File | string>) {
     switch (compare) {
       case "IS_EMPTY": {
         return answer.length === 0
@@ -214,7 +248,7 @@ const engine = {
     userAnswer: { rowId: string; columnId: string },
     expectedAnswer:
       | { rowId: string; columnId: string }
-      | Array<{ rowId: string; columnId: string }>
+      | Array<{ rowId: string; columnId: string }>,
   ) {
     switch (compare) {
       case "ROW_COLUMN_EQUAL": {
@@ -232,7 +266,7 @@ const engine = {
         return expectedAnswer.some(
           (val) =>
             val.rowId === userAnswer.rowId &&
-            val.columnId === userAnswer.columnId
+            val.columnId === userAnswer.columnId,
         )
       }
       case "ROW_COLUMN_NOT_WITHIN": {
@@ -241,7 +275,7 @@ const engine = {
         return !expectedAnswer.some(
           (val) =>
             val.rowId === userAnswer.rowId &&
-            val.columnId === userAnswer.columnId
+            val.columnId === userAnswer.columnId,
         )
       }
 
@@ -254,7 +288,7 @@ const engine = {
   evaluateMatrixMultiChoice(
     compare: TMatrixCompare,
     userAnswer: Array<{ rowId: string; columnId: string }>,
-    expectedAnswer: Array<{ rowId: string; columnId: string }>
+    expectedAnswer: Array<{ rowId: string; columnId: string }>,
   ) {
     switch (compare) {
       case "ROW_COLUMN_EQUAL": {
@@ -317,13 +351,13 @@ const engine = {
             !isNumberArray(params.expectedValue) &&
             !isNumber(params.expectedValue)
           ) {
-            throw new Number("only number or array of number expected")
+            throw new Error("only number or array of number expected")
           }
 
           return this.evaluateNumberCompare(
             compare,
             answer,
-            params.expectedValue
+            params.expectedValue,
           )
         }
 
@@ -360,18 +394,117 @@ const engine = {
           return this.evaluateDateCompare(
             params.compare.comparison,
             params.userAnswer.value,
-            params.expectedValue
+            params.expectedValue,
           )
         }
-        case EQuestionType.MATRIX_SINGLE_CHOICE:
-        case EQuestionType.MATRIX_MULTI_CHOICE: {
+        case EQuestionType.MATRIX_SINGLE_CHOICE: {
           if (
-            params.compare.questionType !==
-              EQuestionType.MATRIX_SINGLE_CHOICE &&
-            params.compare.questionType !== EQuestionType.MATRIX_MULTI_CHOICE
+            params.compare.questionType !== EQuestionType.MATRIX_SINGLE_CHOICE
           ) {
             throw new Error("invalida compare type")
           }
+
+          const answerType = params.userAnswer.questionType
+          if (answerType !== EQuestionType.MATRIX_SINGLE_CHOICE) {
+            throw new Error("invalid user answer type")
+          }
+
+          const expectedValue = params.expectedValue
+          const objValue =
+            !Array.isArray(expectedValue) &&
+            typeof expectedValue === "object" &&
+            "rowId" in expectedValue &&
+            "columnId" in expectedValue
+          const arrayVal = isMatrixValueArray(expectedValue)
+
+          if (!objValue && !arrayVal) {
+            throw new Error("invalid expected value type")
+          }
+
+          return this.evaluateMatrixSingleChoice(
+            params.compare.comparison,
+            params.userAnswer.value,
+            expectedValue,
+          )
+        }
+        case EQuestionType.MATRIX_MULTI_CHOICE: {
+          if (
+            params.compare.questionType !== EQuestionType.MATRIX_MULTI_CHOICE
+          ) {
+            throw new Error("invalid compare type")
+          }
+
+          if (
+            params.userAnswer.questionType !== EQuestionType.MATRIX_MULTI_CHOICE
+          ) {
+            throw new Error("invalid user answer type")
+          }
+
+          if (!isMatrixValueArray(params.expectedValue)) {
+            throw new Error("invalid expected value type")
+          }
+
+          return this.evaluateMatrixMultiChoice(
+            params.compare.comparison,
+            params.userAnswer.value,
+            params.expectedValue,
+          )
+        }
+
+        case EQuestionType.MULTIPLE_CHOICE: {
+          if (params.compare.questionType !== EQuestionType.MULTIPLE_CHOICE) {
+            throw new Error("invalid compare type")
+          }
+
+          if (
+            params.userAnswer.questionType !== EQuestionType.MULTIPLE_CHOICE
+          ) {
+            throw new Error("invalid user answer type")
+          }
+
+          if (!isStringArray(params.expectedValue)) {
+            throw new Error("invalid expected value type")
+          }
+          return this.evaluateMultiChoiceCompare(
+            params.compare.comparison,
+            params.userAnswer.value,
+            params.expectedValue,
+          )
+        }
+        case EQuestionType.SINGLE_CHOICE: {
+          if (params.compare.questionType !== EQuestionType.SINGLE_CHOICE) {
+            throw new Error("invalid compare type")
+          }
+
+          if (params.userAnswer.questionType !== EQuestionType.SINGLE_CHOICE) {
+            throw new Error("invalid user answer type")
+          }
+
+          if (
+            typeof params.expectedValue !== "string" &&
+            !isStringArray(params.expectedValue)
+          ) {
+            throw new Error("invalid expected value type")
+          }
+
+          return this.evaluatesingleChoiceCompare(
+            params.compare.comparison,
+            params.userAnswer.value,
+            params.expectedValue,
+          )
+        }
+
+        case EQuestionType.FILE_UPLOAD: {
+          if (params.compare.questionType !== EQuestionType.FILE_UPLOAD) {
+            throw new Error("invalid compare type provoded")
+          }
+          if (params.userAnswer.questionType !== EQuestionType.FILE_UPLOAD) {
+            throw new Error("invalid user answer prvoded")
+          }
+          return this.evaluateFileCompare(
+            params.compare.comparison,
+            params.userAnswer.value,
+          )
         }
       }
     }

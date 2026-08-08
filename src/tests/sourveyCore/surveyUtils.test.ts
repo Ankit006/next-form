@@ -45,7 +45,7 @@ describe("test creatreQuestionDefaultConfig", () => {
 
   it("should default shuffle enable to false for MATRIX_SINGLE_CHOICE config", () => {
     const config = createQuestionDefaultConfig(
-      EQuestionType.MATRIX_SINGLE_CHOICE
+      EQuestionType.MATRIX_SINGLE_CHOICE,
     )
     if (config.type !== EQuestionType.MATRIX_SINGLE_CHOICE)
       throw new Error("expected MATRIX_SINGLE_CHOICE")
@@ -56,7 +56,7 @@ describe("test creatreQuestionDefaultConfig", () => {
 
   it("should default shuffle enable to false for MATRIX_MULTI_CHOICE config", () => {
     const config = createQuestionDefaultConfig(
-      EQuestionType.MATRIX_MULTI_CHOICE
+      EQuestionType.MATRIX_MULTI_CHOICE,
     )
     if (config.type !== EQuestionType.MATRIX_MULTI_CHOICE)
       throw new Error("expected MATRIX_MULTI_CHOICE")
@@ -76,7 +76,7 @@ describe("test creatreQuestionDefaultConfig", () => {
 
   it("should throw for invalid question type", () => {
     expect(() =>
-      createQuestionDefaultConfig("INVALID_TYPE" as EQuestionType)
+      createQuestionDefaultConfig("INVALID_TYPE" as EQuestionType),
     ).toThrow("wrong question type")
   })
 })
@@ -87,14 +87,14 @@ describe("test getLogicalCompare", () => {
     const compareObj = getLogicalCompare(EQuestionType.TEXT_INPUT, "EQUAL")
     expect(compareObj.questionType).toBe(EQuestionType.TEXT_INPUT)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.TEXT_INPUT
+      EQuestionType.TEXT_INPUT,
     )
 
     expect(allowCompareList).toContain(compareObj.comparison)
   })
   it("return error when invalid compare provided for TEXT_INPUT", () => {
     expect(() =>
-      getLogicalCompare(EQuestionType.TEXT_INPUT, "GREATER")
+      getLogicalCompare(EQuestionType.TEXT_INPUT, "GREATER"),
     ).toThrow("invalid logical compare provided for text input")
   })
 
@@ -103,14 +103,14 @@ describe("test getLogicalCompare", () => {
     const compareObj = getLogicalCompare(EQuestionType.NUMBER_INPUT, "GREATER")
     expect(compareObj.questionType).toBe(EQuestionType.NUMBER_INPUT)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.NUMBER_INPUT
+      EQuestionType.NUMBER_INPUT,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on NUMBER_INPUT", () => {
     expect(() =>
-      getLogicalCompare(EQuestionType.NUMBER_INPUT, "CONTAINS")
+      getLogicalCompare(EQuestionType.NUMBER_INPUT, "CONTAINS"),
     ).toThrow("wrong compare provided for number input")
   })
 
@@ -119,14 +119,14 @@ describe("test getLogicalCompare", () => {
     const compareObj = getLogicalCompare(EQuestionType.RATING, "EQUAL")
     expect(compareObj.questionType).toBe(EQuestionType.RATING)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.RATING
+      EQuestionType.RATING,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on RATING", () => {
     expect(() => getLogicalCompare(EQuestionType.RATING, "CONTAINS")).toThrow(
-      "wrong compare provided for rating"
+      "wrong compare provided for rating",
     )
   })
 
@@ -135,14 +135,14 @@ describe("test getLogicalCompare", () => {
     const compareObj = getLogicalCompare(EQuestionType.DATE, "BEFORE")
     expect(compareObj.questionType).toBe(EQuestionType.DATE)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.DATE
+      EQuestionType.DATE,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on DATE", () => {
     expect(() => getLogicalCompare(EQuestionType.DATE, "CONTAINS")).toThrow(
-      "wrong compare provided fro date input"
+      "wrong compare provided fro date input",
     )
   })
 
@@ -151,14 +151,14 @@ describe("test getLogicalCompare", () => {
     const compareObj = getLogicalCompare(EQuestionType.DATE_TIME, "AFTER")
     expect(compareObj.questionType).toBe(EQuestionType.DATE_TIME)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.DATE_TIME
+      EQuestionType.DATE_TIME,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on DATE_TIME", () => {
     expect(() =>
-      getLogicalCompare(EQuestionType.DATE_TIME, "CONTAINS")
+      getLogicalCompare(EQuestionType.DATE_TIME, "CONTAINS"),
     ).toThrow("wrong compare provided for date time input")
   })
 
@@ -167,14 +167,14 @@ describe("test getLogicalCompare", () => {
     const compareObj = getLogicalCompare(EQuestionType.TIME, "EQUALS")
     expect(compareObj.questionType).toBe(EQuestionType.TIME)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.TIME
+      EQuestionType.TIME,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on TIME", () => {
     expect(() => getLogicalCompare(EQuestionType.TIME, "CONTAINS")).toThrow(
-      "wrong compare provided for time input"
+      "wrong compare provided for time input",
     )
   })
 
@@ -183,14 +183,14 @@ describe("test getLogicalCompare", () => {
     const compareObj = getLogicalCompare(EQuestionType.SINGLE_CHOICE, "EQUAL")
     expect(compareObj.questionType).toBe(EQuestionType.SINGLE_CHOICE)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.SINGLE_CHOICE
+      EQuestionType.SINGLE_CHOICE,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on SINGLE_CHOICE", () => {
     expect(() =>
-      getLogicalCompare(EQuestionType.SINGLE_CHOICE, "CONTAINS")
+      getLogicalCompare(EQuestionType.SINGLE_CHOICE, "CONTAINS"),
     ).toThrow("wrong compare provided for single choice input")
   })
 
@@ -198,18 +198,18 @@ describe("test getLogicalCompare", () => {
   it("should return correct obj for MULTIPLE_CHOICE", () => {
     const compareObj = getLogicalCompare(
       EQuestionType.MULTIPLE_CHOICE,
-      "WITHIN"
+      "WITHIN",
     )
     expect(compareObj.questionType).toBe(EQuestionType.MULTIPLE_CHOICE)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.MULTIPLE_CHOICE
+      EQuestionType.MULTIPLE_CHOICE,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on MULTIPLE_CHOICE", () => {
     expect(() =>
-      getLogicalCompare(EQuestionType.MULTIPLE_CHOICE, "CONTAINS")
+      getLogicalCompare(EQuestionType.MULTIPLE_CHOICE, "CONTAINS"),
     ).toThrow("wrong choice provided for multi choice input")
   })
 
@@ -217,18 +217,18 @@ describe("test getLogicalCompare", () => {
   it("should return correct obj for MATRIX_SINGLE_CHOICE", () => {
     const compareObj = getLogicalCompare(
       EQuestionType.MATRIX_SINGLE_CHOICE,
-      "EQUAL"
+      "EQUAL",
     )
     expect(compareObj.questionType).toBe(EQuestionType.MATRIX_SINGLE_CHOICE)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.MATRIX_SINGLE_CHOICE
+      EQuestionType.MATRIX_SINGLE_CHOICE,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on MATRIX_SINGLE_CHOICE", () => {
     expect(() =>
-      getLogicalCompare(EQuestionType.MATRIX_SINGLE_CHOICE, "CONTAINS")
+      getLogicalCompare(EQuestionType.MATRIX_SINGLE_CHOICE, "CONTAINS"),
     ).toThrow("wrong choice provided for matrix single input")
   })
 
@@ -236,18 +236,18 @@ describe("test getLogicalCompare", () => {
   it("should return correct obj for MATRIX_MULTI_CHOICE", () => {
     const compareObj = getLogicalCompare(
       EQuestionType.MATRIX_MULTI_CHOICE,
-      "NOT_WITHIN"
+      "NOT_WITHIN",
     )
     expect(compareObj.questionType).toBe(EQuestionType.MATRIX_MULTI_CHOICE)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.MATRIX_MULTI_CHOICE
+      EQuestionType.MATRIX_MULTI_CHOICE,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on MATRIX_MULTI_CHOICE", () => {
     expect(() =>
-      getLogicalCompare(EQuestionType.MATRIX_MULTI_CHOICE, "CONTAINS")
+      getLogicalCompare(EQuestionType.MATRIX_MULTI_CHOICE, "CONTAINS"),
     ).toThrow("wrong choice provided for matrix multi input")
   })
 
@@ -256,21 +256,21 @@ describe("test getLogicalCompare", () => {
     const compareObj = getLogicalCompare(EQuestionType.FILE_UPLOAD, "IS_EMPTY")
     expect(compareObj.questionType).toBe(EQuestionType.FILE_UPLOAD)
     const allowCompareList = getLogicalCompareListForQuestion(
-      EQuestionType.FILE_UPLOAD
+      EQuestionType.FILE_UPLOAD,
     )
     expect(allowCompareList).toContain(compareObj.comparison)
   })
 
   it("should throw for invalid compare on FILE_UPLOAD", () => {
     expect(() =>
-      getLogicalCompare(EQuestionType.FILE_UPLOAD, "CONTAINS")
+      getLogicalCompare(EQuestionType.FILE_UPLOAD, "CONTAINS"),
     ).toThrow("Wrong compare provided for File uplaod field")
   })
 
   // invalid type
   it("should throw for invalid question type", () => {
     expect(() =>
-      getLogicalCompare("INVALID_TYPE" as EQuestionType, "EQUAL")
+      getLogicalCompare("INVALID_TYPE" as EQuestionType, "EQUAL"),
     ).toThrow("Provide valid types")
   })
 })
@@ -285,7 +285,7 @@ describe("test getLogicalCompareForVariable", () => {
 
   it("should throw for invalid compare on string variable", () => {
     expect(() => getLogicalCompareForVariable("string", "GREATER")).toThrow(
-      "wrong compare provided for string variable"
+      "wrong compare provided for string variable",
     )
   })
 
@@ -298,7 +298,7 @@ describe("test getLogicalCompareForVariable", () => {
 
   it("should throw for invalid compare on number variable", () => {
     expect(() => getLogicalCompareForVariable("number", "CONTAINS")).toThrow(
-      "wrong compare provided for number variable"
+      "wrong compare provided for number variable",
     )
   })
 })

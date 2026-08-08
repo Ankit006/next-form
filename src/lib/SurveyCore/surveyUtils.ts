@@ -1,4 +1,3 @@
-import { EQuestionType } from "./surveyInterface"
 import type {
   IPage,
   IQuestion,
@@ -11,6 +10,7 @@ import type {
   TQuestionConfig,
   TTextInputCompare,
 } from "./surveyInterface"
+import { EQuestionType } from "./surveyInterface"
 
 export const textCompare: ReadonlyArray<TTextInputCompare> = [
   "CONTAINS",
@@ -54,7 +54,7 @@ export const matrixCompare: ReadonlyArray<TMatrixCompare> = [
 ] as const
 
 export function createQuestionDefaultConfig(
-  questionType: EQuestionType
+  questionType: EQuestionType,
 ): TQuestionConfig {
   switch (questionType) {
     case EQuestionType.DATE:
@@ -269,8 +269,8 @@ export function getLogicalCompareListForQuestion<
   }
 }
 type TLogicalComparesForVariablesListMap = {
-  ["string"]: Array<TTextInputCompare>
-  ["number"]: Array<TNumberCompare>
+  string: Array<TTextInputCompare>
+  number: Array<TNumberCompare>
 }
 
 export function getLogicalCompareListForVariable<
@@ -292,12 +292,12 @@ export function getLogicalCompare(
     | TNumberCompare
     | TDateTimeCompare
     | TChoiceCompare
-    | TFileCompare
+    | TFileCompare,
 ): TLogicCompares {
   switch (type) {
     case EQuestionType.TEXT_INPUT: {
       const compareList = getLogicalCompareListForQuestion(
-        EQuestionType.TEXT_INPUT
+        EQuestionType.TEXT_INPUT,
       )
       if (!compareList.includes(compare as TTextInputCompare)) {
         throw new Error("invalid logical compare provided for text input")
@@ -310,7 +310,7 @@ export function getLogicalCompare(
 
     case EQuestionType.NUMBER_INPUT: {
       const numberCompares = getLogicalCompareListForQuestion(
-        EQuestionType.NUMBER_INPUT
+        EQuestionType.NUMBER_INPUT,
       )
       if (!numberCompares.includes(compare as TNumberCompare)) {
         throw new Error(`wrong compare provided for number input`)
@@ -323,7 +323,7 @@ export function getLogicalCompare(
 
     case EQuestionType.RATING: {
       const ratingCompare = getLogicalCompareListForQuestion(
-        EQuestionType.RATING
+        EQuestionType.RATING,
       )
       if (!ratingCompare.includes(compare as TNumberCompare)) {
         throw new Error("wrong compare provided for rating")
@@ -346,7 +346,7 @@ export function getLogicalCompare(
 
     case EQuestionType.DATE_TIME: {
       const dateTimeCompares = getLogicalCompareListForQuestion(
-        EQuestionType.DATE_TIME
+        EQuestionType.DATE_TIME,
       )
       if (!dateTimeCompares.includes(compare as TDateTimeCompare)) {
         throw new Error("wrong compare provided for date time input")
@@ -372,7 +372,7 @@ export function getLogicalCompare(
 
     case EQuestionType.SINGLE_CHOICE: {
       const choiceCompares = getLogicalCompareListForQuestion(
-        EQuestionType.SINGLE_CHOICE
+        EQuestionType.SINGLE_CHOICE,
       )
       if (!choiceCompares.includes(compare as TChoiceCompare)) {
         throw new Error("wrong compare provided for single choice input")
@@ -386,7 +386,7 @@ export function getLogicalCompare(
 
     case EQuestionType.MULTIPLE_CHOICE: {
       const multiChoiceCompares = getLogicalCompareListForQuestion(
-        EQuestionType.MULTIPLE_CHOICE
+        EQuestionType.MULTIPLE_CHOICE,
       )
       if (!multiChoiceCompares.includes(compare as TChoiceCompare)) {
         throw new Error("wrong choice provided for multi choice input")
@@ -399,7 +399,7 @@ export function getLogicalCompare(
 
     case EQuestionType.MATRIX_SINGLE_CHOICE: {
       const matrixCompares = getLogicalCompareListForQuestion(
-        EQuestionType.MATRIX_SINGLE_CHOICE
+        EQuestionType.MATRIX_SINGLE_CHOICE,
       )
       if (!matrixCompares.includes(compare as TMatrixCompare)) {
         throw new Error("wrong choice provided for matrix single input")
@@ -413,7 +413,7 @@ export function getLogicalCompare(
 
     case EQuestionType.MATRIX_MULTI_CHOICE: {
       const multiMatrixCompares = getLogicalCompareListForQuestion(
-        EQuestionType.MATRIX_MULTI_CHOICE
+        EQuestionType.MATRIX_MULTI_CHOICE,
       )
       if (!multiMatrixCompares.includes(compare as TMatrixCompare)) {
         throw new Error("wrong choice provided for matrix multi input")
@@ -427,7 +427,7 @@ export function getLogicalCompare(
 
     case EQuestionType.FILE_UPLOAD: {
       const fileCompareList = getLogicalCompareListForQuestion(
-        EQuestionType.FILE_UPLOAD
+        EQuestionType.FILE_UPLOAD,
       )
       if (!fileCompareList.includes(compare as TFileCompare)) {
         throw new Error("Wrong compare provided for File uplaod field")
@@ -446,7 +446,7 @@ export function getLogicalCompare(
 
 export function getLogicalCompareForVariable(
   variableDataType: "string" | "number",
-  compare: TTextInputCompare | TNumberCompare
+  compare: TTextInputCompare | TNumberCompare,
 ): TLogicCompares {
   if (variableDataType === "string") {
     const compareList = getLogicalCompareListForVariable("string")
@@ -476,7 +476,7 @@ export function getLogicalCompareForVariable(
 }
 
 export function isMatrixValueArray(
-  val: unknown
+  val: unknown,
 ): val is Array<{ rowId: string; columnId: string }> {
   return (
     Array.isArray(val) &&
@@ -492,7 +492,7 @@ export function isMatrixValueArray(
 
 export function isMatrixArrayContainsSame(
   arr1: Array<{ rowId: string; columnId: string }>,
-  arr2: Array<{ rowId: string; columnId: string }>
+  arr2: Array<{ rowId: string; columnId: string }>,
 ) {
   const counts = new Map<string, number>()
 
@@ -513,13 +513,13 @@ export function isMatrixArrayContainsSame(
 
 export function isMatrixSubValueList(
   list: Array<{ rowId: string; columnId: string }>,
-  subList: Array<{ rowId: string; columnId: string }>
+  subList: Array<{ rowId: string; columnId: string }>,
 ) {
   const uniqueList = new Set<string>(
-    list.map((data) => `${data.rowId}-${data.columnId}`)
+    list.map((data) => `${data.rowId}-${data.columnId}`),
   )
 
   return subList.every((data) =>
-    uniqueList.has(`${data.rowId}-${data.columnId}`)
+    uniqueList.has(`${data.rowId}-${data.columnId}`),
   )
 }

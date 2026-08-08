@@ -1,9 +1,4 @@
 import { v4 as uuid } from "uuid"
-import {
-  createQuestionDefaultConfig,
-  getLogicalCompare,
-  getLogicalCompareForVariable,
-} from "./surveyUtils"
 import type {
   EQuestionType,
   ILogicCondition,
@@ -20,6 +15,11 @@ import type {
   TNumberCompare,
   TTextInputCompare,
 } from "./surveyInterface"
+import {
+  createQuestionDefaultConfig,
+  getLogicalCompare,
+  getLogicalCompareForVariable,
+} from "./surveyUtils"
 
 const builder = {
   // ---------------------------//
@@ -146,7 +146,7 @@ const builder = {
         source,
         compares: getLogicalCompareForVariable(
           source.dataType,
-          compare as TTextInputCompare | TNumberCompare
+          compare as TTextInputCompare | TNumberCompare,
         ),
         expectedValue,
       }

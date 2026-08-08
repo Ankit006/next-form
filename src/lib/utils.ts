@@ -1,7 +1,7 @@
+import type { ClassValue } from "clsx"
 import { clsx } from "clsx"
 import dayjs from "dayjs"
 import { twMerge } from "tailwind-merge"
-import type { ClassValue } from "clsx"
 
 export function cn(...inputs: Array<ClassValue>) {
   return twMerge(clsx(inputs))
@@ -30,9 +30,9 @@ export function isValidDate(value: string | number): boolean {
 // check if two array has same length and contains same elements
 export function containsSameElement<T extends string | number>(
   arr1: Array<T> | Array<T>,
-  arr2: Array<T> | Array<T>
+  arr2: Array<T> | Array<T>,
 ): boolean {
-  if (arr1.length !== arr1.length) return false
+  if (arr1.length !== arr2.length) return false
   const counts = new Map()
   for (const x of arr1) {
     counts.set(x, (counts.get(x) || 0) + 1)
@@ -47,7 +47,7 @@ export function containsSameElement<T extends string | number>(
 
 export function containsAll<T extends string | number>(
   arr: Array<T>,
-  subArr: Array<T>
+  subArr: Array<T>,
 ): boolean {
   const arrSet = new Set<T>(arr)
 
@@ -57,7 +57,7 @@ export function containsAll<T extends string | number>(
 // No duplicate
 export function containsAllStrict<T extends string | number>(
   arr: Array<T>,
-  subArr: Array<T>
+  subArr: Array<T>,
 ): boolean {
   if (subArr.length > arr.length) return false
   const counts = new Map<T, number>()

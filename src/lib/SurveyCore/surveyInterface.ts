@@ -38,6 +38,10 @@ export type TAnswer =
       value: string
     }
   | {
+      questionType: EQuestionType.MULTIPLE_CHOICE
+      value: Array<string>
+    }
+  | {
       questionType:
         | EQuestionType.TIME
         | EQuestionType.DATE
@@ -50,7 +54,7 @@ export type TAnswer =
     }
   | {
       questionType: EQuestionType.FILE_UPLOAD
-      value: File | string | Array<File> | Array<string> // string for url of the uploaded file in a remote server
+      value: Array<File> | Array<string> // string for url of the uploaded file in a remote server
     }
   | {
       questionType: EQuestionType.MATRIX_SINGLE_CHOICE
@@ -102,7 +106,8 @@ export type TLogicExpectedValue =
   | Array<string>
   | Array<number>
   | Date
-  | { rowId: string; columnId: string | Array<string> }
+  | { rowId: string; columnId: string }
+  | Array<{ rowId: string; columnId: string }>
 export type TLogicCompares =
   | {
       questionType: EQuestionType.TEXT_INPUT
