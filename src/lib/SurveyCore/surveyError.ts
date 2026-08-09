@@ -1,9 +1,15 @@
-import type { TChoiceCompare, TTextInputCompare } from "./surveyInterface"
+import type {
+  EQuestionType,
+  TChoiceCompare,
+  TMatrixCompare,
+  TNumberCompare,
+  TTextInputCompare,
+} from "./surveyInterface"
 
 export class SurveyEngineError extends Error {
   constructor(
     message: string,
-    public readonly contenxt: {
+    public readonly context: {
       method: string
       expected: string
       received: string
@@ -44,21 +50,108 @@ export function handleEvaluteChoiceCompareError(
 ): never {
   if (compare === "EQUAL") {
     throw new SurveyEngineError(
-      `[evaluatesingleChoiceCompare] expected string for compare ${compare}`,
+      `[evaluateSingleChoiceCompare] expected string for compare ${compare}`,
       {
         expected: "string",
         received: "Array<string>",
-        method: "evaluatesingleChoiceCompare",
+        method: "evaluateSingleChoiceCompare",
       },
     )
   } else {
     throw new SurveyEngineError(
-      `[evaluatesingleChoiceCompare] expected Array<string> for compare ${compare}`,
+      `[evaluateSingleChoiceCompare] expected Array<string> for compare ${compare}`,
       {
         expected: "Array<string>",
         received: "string",
-        method: "evaluatesingleChoiceCompare",
+        method: "evaluateSingleChoiceCompare",
       },
     )
   }
+}
+
+export function handleEvaluateNumberCompareError(
+  compare: TNumberCompare,
+): never {
+  if (compare === "WITHIN") {
+    throw new SurveyEngineError(
+      `[evaluateNumberCompare] expected Array<number> for compare ${compare}`,
+      {
+        expected: "Array<number>",
+        received: "number",
+        method: "evaluateNumberCompare",
+      },
+    )
+  } else {
+    throw new SurveyEngineError(
+      `[evaluateNumberCompare] expected number for compare ${compare}`,
+      {
+        expected: "number",
+        received: "Array<number>",
+        method: "evaluateNumberCompare",
+      },
+    )
+  }
+}
+
+export function handleEvaluateMatrixSingleChoiceError(
+  compare: TMatrixCompare,
+): never {
+  if (compare === "ROW_COLUMN_EQUAL") {
+    throw new SurveyEngineError(
+      `[evaluateMatrixSingleChoice] expected object for compare ${compare}`,
+      {
+        expected: "{ rowId: string; columnId: string }",
+        received: "Array",
+        method: "evaluateMatrixSingleChoice",
+      },
+    )
+  } else {
+    throw new SurveyEngineError(
+      `[evaluateMatrixSingleChoice] expected array for compare ${compare}`,
+      {
+        expected: "Array<{ rowId: string; columnId: string }>",
+        received: "object",
+        method: "evaluateMatrixSingleChoice",
+      },
+    )
+  }
+}
+
+export const evaluateConditionErrors: {
+  compareMismatch: (
+    expectedType: EQuestionType,
+    receivedType: EQuestionType | "VARIABLE",
+  ) => never
+  userAnswerMismatch: (
+    expectedType: EQuestionType,
+    receivedType: EQuestionType | "VARIABLE",
+  ) => never
+} = {
+  compareMismatch: (
+    expectedType: EQuestionType,
+    receivedType: EQuestionType | "VARIABLE",
+  ): never => {
+    throw new SurveyEngineError(
+      `[evaluateCondition -> ${expectedType}] compare question type mismatch`,
+      {
+        expected: expectedType,
+        received: receivedType,
+        method: "evaluateCondition",
+      },
+    )
+  },
+
+  userAnswerMismatch: (
+    expectedType: EQuestionType,
+    receivedType: EQuestionType | "VARIABLE",
+  ): never => {
+    throw new SurveyEngineError(
+      `[evaluateCondition -> ${expectedType}] userAnswer type mismatch`,
+      {
+        expected: expectedType,
+        received: receivedType,
+        method: "evaluateCondition",
+      },
+    )
+  },
 }

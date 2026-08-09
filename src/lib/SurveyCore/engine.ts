@@ -8,8 +8,12 @@ import {
   isStringArray,
 } from "../utils"
 import {
+  evaluateConditionErrors,
+  handleEvaluateMatrixSingleChoiceError,
+  handleEvaluateNumberCompareError,
   handleEvaluateTextCompareError,
   handleEvaluteChoiceCompareError,
+  SurveyEngineError,
 } from "./surveyError"
 import type {
   TAnswer,
@@ -92,7 +96,14 @@ const engine = {
         return expected.includes(answer)
       }
       default: {
-        throw new Error("unxpected compare provided")
+        throw new SurveyEngineError(
+          `[evaluateTextCompare] unexpected compare provided`,
+          {
+            expected: "TTextInputCompare",
+            received: compare,
+            method: "evaluateTextCompare",
+          },
+        )
       }
     }
   },
@@ -115,12 +126,19 @@ const engine = {
         return !containsAll<string>(answer, expected)
       }
       default: {
-        throw new Error("unxpected compare provided")
+        throw new SurveyEngineError(
+          `[evaluateMultiChoiceCompare] unexpected compare provided`,
+          {
+            expected: "TChoiceCompare",
+            received: compare,
+            method: "evaluateMultiChoiceCompare",
+          },
+        )
       }
     }
   },
 
-  evaluatesingleChoiceCompare(
+  evaluateSingleChoiceCompare(
     compare: TChoiceCompare,
     answer: string,
     expected: string | Array<string>,
@@ -149,7 +167,14 @@ const engine = {
       }
 
       default: {
-        throw new Error("unexpected compare provided")
+        throw new SurveyEngineError(
+          `[evaluateSingleChoiceCompare] unexpected compare provided`,
+          {
+            expected: "TChoiceCompare",
+            received: compare,
+            method: "evaluateSingleChoiceCompare",
+          },
+        )
       }
     }
   },
@@ -161,43 +186,44 @@ const engine = {
   ) {
     switch (compare) {
       case "EQUAL": {
-        if (!isNumber(expected))
-          throw new Error(`got ${typeof expected}, expect number`)
+        if (!isNumber(expected)) handleEvaluateNumberCompareError(compare)
         return answer === expected
       }
 
       case "GREATER": {
-        if (!isNumber(expected))
-          throw new Error(`got ${typeof expected}, expect number`)
+        if (!isNumber(expected)) handleEvaluateNumberCompareError(compare)
 
         return answer > expected
       }
 
       case "GREATER_THAN_EQUAL": {
-        if (!isNumber(expected))
-          throw new Error(`got ${typeof expected}, expect number`)
+        if (!isNumber(expected)) handleEvaluateNumberCompareError(compare)
         return answer >= expected
       }
       case "LESSER": {
-        if (!isNumber(expected))
-          throw new Error(`got ${typeof expected}, expect number`)
+        if (!isNumber(expected)) handleEvaluateNumberCompareError(compare)
         return answer < expected
       }
 
       case "LESSER_THAN_EQUAL": {
-        if (!isNumber(expected))
-          throw new Error(`got ${typeof expected}, expect number`)
+        if (!isNumber(expected)) handleEvaluateNumberCompareError(compare)
         return answer <= expected
       }
 
       case "WITHIN": {
-        if (!isNumberArray(expected))
-          throw new Error(`got ${typeof expected}, expect number array`)
+        if (!isNumberArray(expected)) handleEvaluateNumberCompareError(compare)
         return expected.includes(answer)
       }
 
       default: {
-        throw new Error("unxpected compare provided")
+        throw new SurveyEngineError(
+          `[evaluateNumberCompare] unexpected compare provided`,
+          {
+            expected: "TNumberCompare",
+            received: compare,
+            method: "evaluateNumberCompare",
+          },
+        )
       }
     }
   },
@@ -229,7 +255,14 @@ const engine = {
         return !dayjs(answer).isSame(expected)
       }
       default: {
-        throw new Error("unxpected compare provided")
+        throw new SurveyEngineError(
+          `[evaluateDateCompare] unexpected compare provided`,
+          {
+            expected: "TDateTimeCompare",
+            received: compare,
+            method: "evaluateDateCompare",
+          },
+        )
       }
     }
   },
@@ -243,7 +276,14 @@ const engine = {
         return answer.length !== 0
       }
       default: {
-        throw new Error("unxpected compare provided")
+        throw new SurveyEngineError(
+          `[evaluateFileCompare] unexpected compare provided`,
+          {
+            expected: "TFileCompare",
+            received: compare,
+            method: "evaluateFileCompare",
+          },
+        )
       }
     }
   },
@@ -258,7 +298,7 @@ const engine = {
     switch (compare) {
       case "ROW_COLUMN_EQUAL": {
         if (isMatrixValueArray(expectedAnswer))
-          throw new Error("exptedAnswer must object, got array")
+          handleEvaluateMatrixSingleChoiceError(compare)
 
         return (
           userAnswer.rowId === expectedAnswer.rowId &&
@@ -267,7 +307,7 @@ const engine = {
       }
       case "ROW_COLUMN_WITHIN": {
         if (!isMatrixValueArray(expectedAnswer))
-          throw new Error("expectedAnswer must be an array")
+          handleEvaluateMatrixSingleChoiceError(compare)
         return expectedAnswer.some(
           (val) =>
             val.rowId === userAnswer.rowId &&
@@ -276,7 +316,7 @@ const engine = {
       }
       case "ROW_COLUMN_NOT_WITHIN": {
         if (!isMatrixValueArray(expectedAnswer))
-          throw new Error("expectedAnswer must be an array")
+          handleEvaluateMatrixSingleChoiceError(compare)
         return !expectedAnswer.some(
           (val) =>
             val.rowId === userAnswer.rowId &&
@@ -285,7 +325,14 @@ const engine = {
       }
 
       default: {
-        throw new Error("invalid compare type")
+        throw new SurveyEngineError(
+          `[evaluateMatrixSingleChoice] unexpected compare provided`,
+          {
+            expected: "TMatrixCompare",
+            received: compare,
+            method: "evaluateMatrixSingleChoice",
+          },
+        )
       }
     }
   },
@@ -309,7 +356,14 @@ const engine = {
         return isMatrixSubValueList(expectedAnswer, userAnswer)
       }
       default: {
-        throw new Error("invalid compare type")
+        throw new SurveyEngineError(
+          `[evaluateMatrixMultiChoice] unexpected compare provided`,
+          {
+            expected: "TMatrixCompare",
+            received: compare,
+            method: "evaluateMatrixMultiChoice",
+          },
+        )
       }
     }
   },
@@ -319,20 +373,37 @@ const engine = {
       switch (params.questionType) {
         case EQuestionType.TEXT_INPUT: {
           if (params.compare.questionType !== EQuestionType.TEXT_INPUT) {
-            throw new Error("compare questionType mistmatch")
+            evaluateConditionErrors.compareMismatch(
+              EQuestionType.TEXT_INPUT,
+              params.compare.questionType,
+            )
           }
-          const compare = params.compare.comparison
+
           if (params.userAnswer.questionType !== EQuestionType.TEXT_INPUT) {
-            throw new Error("userAnswer questionType mismatch")
+            evaluateConditionErrors.userAnswerMismatch(
+              EQuestionType.TEXT_INPUT,
+              params.userAnswer.questionType,
+            )
           }
           const answer = params.userAnswer.value
           if (
             !isStringArray(params.expectedValue) &&
             !isString(params.expectedValue)
           ) {
-            throw new Error("only string or array string accepted")
+            throw new SurveyEngineError(
+              `[evaluateCondition -> TEXT_INPUT] invalid expected value type`,
+              {
+                expected: "string | Array<string>",
+                received: typeof params.expectedValue,
+                method: "evaluateCondition",
+              },
+            )
           }
-          return this.evaluateTextCompare(compare, answer, params.expectedValue)
+          return this.evaluateTextCompare(
+            params.compare.comparison,
+            answer,
+            params.expectedValue,
+          )
         }
 
         case EQuestionType.RATING:
@@ -341,24 +412,35 @@ const engine = {
             params.compare.questionType !== EQuestionType.NUMBER_INPUT &&
             params.compare.questionType !== EQuestionType.RATING
           ) {
-            throw new Error("compare questionType mismatch")
+            evaluateConditionErrors.compareMismatch(
+              EQuestionType.NUMBER_INPUT,
+              params.compare.questionType,
+            )
           }
           const compare = params.compare.comparison
-
           if (
             params.userAnswer.questionType !== EQuestionType.NUMBER_INPUT &&
             params.userAnswer.questionType !== EQuestionType.RATING
           ) {
-            throw new Error("userAnswer question type mismatch")
+            evaluateConditionErrors.userAnswerMismatch(
+              EQuestionType.NUMBER_INPUT,
+              params.userAnswer.questionType,
+            )
           }
           const answer = params.userAnswer.value
           if (
             !isNumberArray(params.expectedValue) &&
             !isNumber(params.expectedValue)
           ) {
-            throw new Error("only number or array of number expected")
+            throw new SurveyEngineError(
+              `[evaluateCondition -> NUMBER_INPUT] invalid expected value type`,
+              {
+                expected: "number | Array<number>",
+                received: typeof params.expectedValue,
+                method: "evaluateCondition",
+              },
+            )
           }
-
           return this.evaluateNumberCompare(
             compare,
             answer,
@@ -375,81 +457,76 @@ const engine = {
             compareQuestionType !== EQuestionType.DATE_TIME &&
             compareQuestionType !== EQuestionType.TIME
           ) {
-            throw new Error("compare question type mismatch")
+            evaluateConditionErrors.compareMismatch(
+              EQuestionType.DATE,
+              compareQuestionType,
+            )
           }
-
           const answerType = params.userAnswer.questionType
-
           if (
             answerType !== EQuestionType.DATE &&
             answerType !== EQuestionType.DATE_TIME &&
             answerType !== EQuestionType.TIME
           ) {
-            throw new Error("invalid user answer type")
+            evaluateConditionErrors.userAnswerMismatch(
+              EQuestionType.DATE,
+              answerType,
+            )
           }
-
           if (!isString(params.expectedValue)) {
-            throw new Error("expected value must be string or number")
+            throw new SurveyEngineError(
+              `[evaluateCondition -> DATE] invalid expected value type`,
+              {
+                expected: "string",
+                received: typeof params.expectedValue,
+                method: "evaluateCondition",
+              },
+            )
           }
-
           if (!dayjs(params.expectedValue).isValid()) {
-            throw new Error("expected value not a valid date")
+            throw new SurveyEngineError(
+              `[evaluateCondition -> DATE] expected value is not a valid date`,
+              {
+                expected: "valid date string",
+                received: params.expectedValue,
+                method: "evaluateCondition",
+              },
+            )
           }
-
           return this.evaluateDateCompare(
             params.compare.comparison,
             params.userAnswer.value,
             params.expectedValue,
           )
         }
-        case EQuestionType.MATRIX_SINGLE_CHOICE: {
+
+        case EQuestionType.SINGLE_CHOICE: {
+          if (params.compare.questionType !== EQuestionType.SINGLE_CHOICE) {
+            evaluateConditionErrors.compareMismatch(
+              EQuestionType.SINGLE_CHOICE,
+              params.compare.questionType,
+            )
+          }
+          if (params.userAnswer.questionType !== EQuestionType.SINGLE_CHOICE) {
+            evaluateConditionErrors.userAnswerMismatch(
+              EQuestionType.SINGLE_CHOICE,
+              params.userAnswer.questionType,
+            )
+          }
           if (
-            params.compare.questionType !== EQuestionType.MATRIX_SINGLE_CHOICE
+            !isString(params.expectedValue) &&
+            !isStringArray(params.expectedValue)
           ) {
-            throw new Error("invalida compare type")
+            throw new SurveyEngineError(
+              `[evaluateCondition -> SINGLE_CHOICE] invalid expected value type`,
+              {
+                expected: "string | Array<string>",
+                received: typeof params.expectedValue,
+                method: "evaluateCondition",
+              },
+            )
           }
-
-          const answerType = params.userAnswer.questionType
-          if (answerType !== EQuestionType.MATRIX_SINGLE_CHOICE) {
-            throw new Error("invalid user answer type")
-          }
-
-          const expectedValue = params.expectedValue
-          const objValue =
-            !Array.isArray(expectedValue) &&
-            typeof expectedValue === "object" &&
-            "rowId" in expectedValue &&
-            "columnId" in expectedValue
-          const arrayVal = isMatrixValueArray(expectedValue)
-
-          if (!objValue && !arrayVal) {
-            throw new Error("invalid expected value type")
-          }
-
-          return this.evaluateMatrixSingleChoice(
-            params.compare.comparison,
-            params.userAnswer.value,
-            expectedValue,
-          )
-        }
-        case EQuestionType.MATRIX_MULTI_CHOICE: {
-          if (
-            params.compare.questionType !== EQuestionType.MATRIX_MULTI_CHOICE
-          ) {
-            throw new Error("invalid compare type")
-          }
-
-          if (
-            params.userAnswer.questionType !== EQuestionType.MATRIX_MULTI_CHOICE
-          ) {
-            throw new Error("invalid user answer type")
-          }
-
-          if (!isMatrixValueArray(params.expectedValue)) {
-            throw new Error("invalid expected value type")
-          }
-
-          return this.evaluateMatrixMultiChoice(
+          return this.evaluateSingleChoiceCompare(
             params.compare.comparison,
             params.userAnswer.value,
             params.expectedValue,
@@ -458,17 +535,28 @@ const engine = {
 
         case EQuestionType.MULTIPLE_CHOICE: {
           if (params.compare.questionType !== EQuestionType.MULTIPLE_CHOICE) {
-            throw new Error("invalid compare type")
+            evaluateConditionErrors.compareMismatch(
+              EQuestionType.MULTIPLE_CHOICE,
+              params.compare.questionType,
+            )
           }
-
           if (
             params.userAnswer.questionType !== EQuestionType.MULTIPLE_CHOICE
           ) {
-            throw new Error("invalid user answer type")
+            evaluateConditionErrors.userAnswerMismatch(
+              EQuestionType.MULTIPLE_CHOICE,
+              params.userAnswer.questionType,
+            )
           }
-
           if (!isStringArray(params.expectedValue)) {
-            throw new Error("invalid expected value type")
+            throw new SurveyEngineError(
+              `[evaluateCondition -> MULTIPLE_CHOICE] invalid expected value type`,
+              {
+                expected: "Array<string>",
+                received: typeof params.expectedValue,
+                method: "evaluateCondition",
+              },
+            )
           }
           return this.evaluateMultiChoiceCompare(
             params.compare.comparison,
@@ -476,23 +564,79 @@ const engine = {
             params.expectedValue,
           )
         }
-        case EQuestionType.SINGLE_CHOICE: {
-          if (params.compare.questionType !== EQuestionType.SINGLE_CHOICE) {
-            throw new Error("invalid compare type")
-          }
 
-          if (params.userAnswer.questionType !== EQuestionType.SINGLE_CHOICE) {
-            throw new Error("invalid user answer type")
-          }
-
+        case EQuestionType.MATRIX_SINGLE_CHOICE: {
           if (
-            typeof params.expectedValue !== "string" &&
-            !isStringArray(params.expectedValue)
+            params.compare.questionType !== EQuestionType.MATRIX_SINGLE_CHOICE
           ) {
-            throw new Error("invalid expected value type")
+            evaluateConditionErrors.compareMismatch(
+              EQuestionType.MATRIX_SINGLE_CHOICE,
+              params.compare.questionType,
+            )
           }
+          if (
+            params.userAnswer.questionType !==
+            EQuestionType.MATRIX_SINGLE_CHOICE
+          ) {
+            evaluateConditionErrors.userAnswerMismatch(
+              EQuestionType.MATRIX_SINGLE_CHOICE,
+              params.userAnswer.questionType,
+            )
+          }
+          const expectedValue = params.expectedValue
+          const isObj =
+            !Array.isArray(expectedValue) &&
+            typeof expectedValue === "object" &&
+            expectedValue !== null &&
+            "rowId" in expectedValue &&
+            "columnId" in expectedValue
+          const isArr = isMatrixValueArray(expectedValue)
+          if (!isObj && !isArr) {
+            throw new SurveyEngineError(
+              `[evaluateCondition -> MATRIX_SINGLE_CHOICE] invalid expected value type`,
+              {
+                expected:
+                  "{ rowId: string; columnId: string } | Array<{ rowId: string; columnId: string }>",
+                received: typeof expectedValue,
+                method: "evaluateCondition",
+              },
+            )
+          }
+          return this.evaluateMatrixSingleChoice(
+            params.compare.comparison,
+            params.userAnswer.value,
+            expectedValue,
+          )
+        }
 
-          return this.evaluatesingleChoiceCompare(
+        case EQuestionType.MATRIX_MULTI_CHOICE: {
+          if (
+            params.compare.questionType !== EQuestionType.MATRIX_MULTI_CHOICE
+          ) {
+            evaluateConditionErrors.compareMismatch(
+              EQuestionType.MATRIX_MULTI_CHOICE,
+              params.compare.questionType,
+            )
+          }
+          if (
+            params.userAnswer.questionType !== EQuestionType.MATRIX_MULTI_CHOICE
+          ) {
+            evaluateConditionErrors.userAnswerMismatch(
+              EQuestionType.MATRIX_MULTI_CHOICE,
+              params.userAnswer.questionType,
+            )
+          }
+          if (!isMatrixValueArray(params.expectedValue)) {
+            throw new SurveyEngineError(
+              `[evaluateCondition -> MATRIX_MULTI_CHOICE] invalid expected value type`,
+              {
+                expected: "Array<{ rowId: string; columnId: string }>",
+                received: typeof params.expectedValue,
+                method: "evaluateCondition",
+              },
+            )
+          }
+          return this.evaluateMatrixMultiChoice(
             params.compare.comparison,
             params.userAnswer.value,
             params.expectedValue,
@@ -501,14 +645,31 @@ const engine = {
 
         case EQuestionType.FILE_UPLOAD: {
           if (params.compare.questionType !== EQuestionType.FILE_UPLOAD) {
-            throw new Error("invalid compare type provoded")
+            evaluateConditionErrors.compareMismatch(
+              EQuestionType.FILE_UPLOAD,
+              params.compare.questionType,
+            )
           }
           if (params.userAnswer.questionType !== EQuestionType.FILE_UPLOAD) {
-            throw new Error("invalid user answer prvoded")
+            evaluateConditionErrors.userAnswerMismatch(
+              EQuestionType.FILE_UPLOAD,
+              params.userAnswer.questionType,
+            )
           }
           return this.evaluateFileCompare(
             params.compare.comparison,
             params.userAnswer.value,
+          )
+        }
+
+        default: {
+          throw new SurveyEngineError(
+            `[evaluateCondition] unhandled question type`,
+            {
+              expected: "valid EQuestionType",
+              received: params.questionType,
+              method: "evaluateCondition",
+            },
           )
         }
       }
@@ -518,11 +679,20 @@ const engine = {
         params.value,
         params.expectedValue,
       )
-    } else {
+    } else if (params.type === "VARIABLE" && params.dataType === "number") {
       return this.evaluateNumberCompare(
         params.compare,
         params.value,
         params.expectedValue,
+      )
+    } else {
+      throw new SurveyEngineError(
+        `[evaluateCondition] unhandled condition type`,
+        {
+          expected: "QUESTION | VARIABLE",
+          received: params,
+          method: "evaluateCondition",
+        },
       )
     }
   },
