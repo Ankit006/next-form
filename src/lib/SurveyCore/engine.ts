@@ -7,6 +7,10 @@ import {
   isString,
   isStringArray,
 } from "../utils"
+import {
+  handleEvaluateTextCompareError,
+  handleEvaluteChoiceCompareError,
+} from "./surveyError"
 import type {
   TAnswer,
   TChoiceCompare,
@@ -56,34 +60,35 @@ const engine = {
   ) {
     switch (compare) {
       case "EQUAL": {
-        if (typeof expected !== "string")
-          throw new Error("expact string, get array")
+        if (typeof expected !== "string") {
+          handleEvaluateTextCompareError(compare, expected)
+        }
         return answer === expected
       }
       case "CONTAINS": {
         if (typeof expected !== "string")
-          throw new Error("expact string, get array")
+          handleEvaluateTextCompareError(compare, expected)
         return answer.includes(expected)
       }
       case "REGEX_MATCH": {
         if (typeof expected !== "string")
-          throw new Error("expact string, get array")
+          handleEvaluateTextCompareError(compare, expected)
         const regExp = new RegExp(expected)
         return regExp.test(answer)
       }
       case "STARTS_WITH": {
         if (typeof expected !== "string")
-          throw new Error("expact string, get array")
+          handleEvaluateTextCompareError(compare, expected)
         return answer.startsWith(expected)
       }
       case "ENDS_WITH": {
         if (typeof expected !== "string")
-          throw new Error("expact string, get array")
+          handleEvaluateTextCompareError(compare, expected)
         return answer.endsWith(expected)
       }
       case "WITHIN": {
         if (!isStringArray(expected))
-          throw new Error("expect string array, get string")
+          handleEvaluateTextCompareError(compare, expected)
         return expected.includes(answer)
       }
       default: {
@@ -123,13 +128,13 @@ const engine = {
     switch (compare) {
       case "EQUAL": {
         if (isStringArray(expected)) {
-          throw new Error("invalid expected value")
+          handleEvaluteChoiceCompareError(compare)
         }
         return answer === expected
       }
       case "NOT_WITHIN": {
         if (!isStringArray(expected)) {
-          throw new Error("invalid expected value")
+          handleEvaluteChoiceCompareError(compare)
         }
 
         return !expected.includes(answer)
@@ -137,7 +142,7 @@ const engine = {
 
       case "WITHIN": {
         if (!isStringArray(expected)) {
-          throw new Error("invalid expected value")
+          handleEvaluteChoiceCompareError(compare)
         }
 
         return expected.includes(answer)
@@ -252,7 +257,7 @@ const engine = {
   ) {
     switch (compare) {
       case "ROW_COLUMN_EQUAL": {
-        if (Array.isArray(expectedAnswer))
+        if (isMatrixValueArray(expectedAnswer))
           throw new Error("exptedAnswer must object, got array")
 
         return (
@@ -507,6 +512,18 @@ const engine = {
           )
         }
       }
+    } else if (params.type === "VARIABLE" && params.dataType === "string") {
+      return this.evaluateTextCompare(
+        params.compare,
+        params.value,
+        params.expectedValue,
+      )
+    } else {
+      return this.evaluateNumberCompare(
+        params.compare,
+        params.value,
+        params.expectedValue,
+      )
     }
   },
 }
