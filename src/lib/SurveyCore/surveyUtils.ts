@@ -292,7 +292,8 @@ export function getLogicalCompare(
     | TNumberCompare
     | TDateTimeCompare
     | TChoiceCompare
-    | TFileCompare,
+    | TFileCompare
+    | TMatrixCompare,
 ): TLogicCompares {
   switch (type) {
     case EQuestionType.TEXT_INPUT: {

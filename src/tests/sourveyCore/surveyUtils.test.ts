@@ -217,7 +217,7 @@ describe("test getLogicalCompare", () => {
   it("should return correct obj for MATRIX_SINGLE_CHOICE", () => {
     const compareObj = getLogicalCompare(
       EQuestionType.MATRIX_SINGLE_CHOICE,
-      "EQUAL",
+      "ROW_COLUMN_EQUAL",
     )
     expect(compareObj.questionType).toBe(EQuestionType.MATRIX_SINGLE_CHOICE)
     const allowCompareList = getLogicalCompareListForQuestion(
@@ -228,7 +228,7 @@ describe("test getLogicalCompare", () => {
 
   it("should throw for invalid compare on MATRIX_SINGLE_CHOICE", () => {
     expect(() =>
-      getLogicalCompare(EQuestionType.MATRIX_SINGLE_CHOICE, "CONTAINS"),
+      getLogicalCompare(EQuestionType.MATRIX_SINGLE_CHOICE, "BEFORE"),
     ).toThrow("wrong choice provided for matrix single input")
   })
 
@@ -236,7 +236,7 @@ describe("test getLogicalCompare", () => {
   it("should return correct obj for MATRIX_MULTI_CHOICE", () => {
     const compareObj = getLogicalCompare(
       EQuestionType.MATRIX_MULTI_CHOICE,
-      "NOT_WITHIN",
+      "ROW_COLUMN_EQUAL",
     )
     expect(compareObj.questionType).toBe(EQuestionType.MATRIX_MULTI_CHOICE)
     const allowCompareList = getLogicalCompareListForQuestion(
