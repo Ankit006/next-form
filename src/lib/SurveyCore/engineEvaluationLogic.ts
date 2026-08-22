@@ -347,7 +347,7 @@ export function evaluateMatrixMultiChoice(
   }
 }
 
-type TEvaluteConditionPayload =
+export type TEvaluteConditionPayload =
   | {
       type: "QUESTION"
       questionType: EQuestionType
