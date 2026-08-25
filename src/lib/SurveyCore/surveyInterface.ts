@@ -309,7 +309,7 @@ export interface ISurvey {
   timer?: number // in seconds
   pageOrder: Array<string> // order of pages, this is array of page Id
   pages: Record<string, IPage> // string for page id
-  variables?: Array<ISurveyVariable>
+  variables: Array<ISurveyVariable>
 }
 
 export interface IPage {
