@@ -10,19 +10,19 @@ import type {
   TRunTimeAnswer,
 } from "./surveyInterface"
 
-interface IEvaluateSingleGroupLogicProps {
+interface IEvaluateGroupLogicProps {
   operator: TGroupOperator
   comparisons: Array<ILogicCondition>
   answers: TRunTimeAnswer
   variables: Array<ISurveyVariable>
 }
 
-export function evaluteSingleGroupLogic({
+export function evaluteGroupLogic({
   operator,
   answers,
   comparisons,
   variables,
-}: IEvaluateSingleGroupLogicProps) {
+}: IEvaluateGroupLogicProps) {
   const resultList: boolean[] = []
 
   for (const compare of comparisons) {
